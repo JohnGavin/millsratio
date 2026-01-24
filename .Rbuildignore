@@ -8,3 +8,9 @@
 ^default\.sh$
 ^nix-shell-root$
 ^test_dashboard\.R$
+^_targets\.R$
+^default-ci\.nix$
+^README\.qmd$
+^result$
+^issue_number\.txt$
+^plans$

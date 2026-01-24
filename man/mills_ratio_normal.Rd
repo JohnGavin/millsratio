@@ -22,7 +22,7 @@ Numeric vector of Mills ratios
 Functions to compute Mills ratios for different probability distributions.
 The Mills ratio m(x) is defined as the ratio of the complementary cumulative
 distribution function (CCDF) to the probability density function (PDF):
-m(x) = \link{1 - F(x)} / f(x)
+m(x) = \[1 - F(x)\] / f(x)
 }
 \examples{
 # Standard normal Mills ratio at x = 2
