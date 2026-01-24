@@ -3,7 +3,7 @@
 Functions to compute Mills ratios for different probability
 distributions. The Mills ratio m(x) is defined as the ratio of the
 complementary cumulative distribution function (CCDF) to the probability
-density function (PDF): m(x) = 1 - F(x) / f(x)
+density function (PDF): m(x) = \\1 - F(x)\\ / f(x)
 
 ## Usage
 
