@@ -3,3 +3,8 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^default\.R$
+^default\.nix$
+^default\.sh$
+^nix-shell-root$
+^test_dashboard\.R$
