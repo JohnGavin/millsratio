@@ -21,3 +21,4 @@
 ^pkgdown\.yml$
 ^pr_number\.txt$
 ^references\.bib$
+^vignettes/.*\.qmd$
