@@ -23,6 +23,7 @@ Suggests:
     gt,
     htmlwidgets,
     knitr,
+    quarto,
     rmarkdown,
     scales,
     shinylive,

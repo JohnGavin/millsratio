@@ -1,0 +1,90 @@
+url: https://johngavin.github.io/millsratio/
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+  bslib:
+    pkgdown-nav-height: 100px
+
+navbar:
+  structure:
+    left:  [intro, articles, reference, news]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Mathematical Theory
+        href: articles/theory.html
+      - text: Practical Applications
+        href: articles/applications.html
+      - text: "-------"
+      - text: "Analysis"
+      - text: Hazard Function Connection
+        href: articles/hazard-connection.html
+      - text: Performance Benchmarks
+        href: articles/benchmarks.html
+      - text: "-------"
+      - text: "Interactive"
+      - text: Interactive Dashboard
+        href: articles/dashboard.html
+      - text: WebR Playground
+        href: articles/webr-playground.html
+
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+
+articles:
+- title: Theory and Applications
+  navbar: ~
+  contents:
+  - theory
+  - applications
+  - hazard-connection
+
+- title: Tools and Analysis
+  contents:
+  - benchmarks
+  - dashboard
+  - webr-playground
+
+reference:
+- title: Mills Ratio Functions
+  desc: Core functions for computing Mills ratios
+  contents:
+  - mills_ratio_normal
+  - mills_ratio_t
+  - mills_ratio_exp
+  - mills_ratio_cauchy
+
+- title: Hazard Functions
+  desc: Functions for hazard rate calculations
+  contents:
+  - hazard_from_mills
+  - hazard_function
+  - hazard_normal
+  - hazard_t
+  - hazard_exp
+
+- title: Analysis Functions
+  desc: Functions for analyzing tail behavior
+  contents:
+  - analyze_tail_thickness
+  - analyze_t30_paradox
+  - compare_mills_ratios
+  - compare_mills_hazard
+
+- title: Dashboard Components
+  desc: Functions for the interactive dashboard
+  contents:
+  - launch_dashboard
+  - dashboard_intro
+  - dashboard_about
+  - dashboard_mills_comparison
+  - dashboard_hazard
+  - dashboard_tail_thickness
+  - dashboard_t30_paradox
+
+development:
+  mode: auto
