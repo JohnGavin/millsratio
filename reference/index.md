@@ -6,12 +6,22 @@
   : Generate Data for t(30) Paradox Analysis
 - [`analyze_tail_thickness()`](https://johngavin.github.io/millsratio/reference/analyze_tail_thickness.md)
   : Analyze Tail Thickness at Specific Points
+- [`compare_mills_hazard()`](https://johngavin.github.io/millsratio/reference/compare_mills_hazard.md)
+  : Compare Mills Ratio and Hazard Function
 - [`compare_mills_ratios()`](https://johngavin.github.io/millsratio/reference/compare_mills_ratios.md)
   : Compare Mills Ratios Across Distributions
 - [`dashboard_about()`](https://johngavin.github.io/millsratio/reference/dashboard_about.md)
   : Get Dashboard About Information
 - [`find_crossover_point()`](https://johngavin.github.io/millsratio/reference/find_crossover_point.md)
   : Find Crossover Points Between Distributions
+- [`hazard_from_mills()`](https://johngavin.github.io/millsratio/reference/hazard_from_mills.md)
+  : Convert Mills Ratio to Hazard Function
+- [`hazard_function()`](https://johngavin.github.io/millsratio/reference/hazard_function.md)
+  : Calculate Hazard Function Directly
+- [`hazard_functions`](https://johngavin.github.io/millsratio/reference/hazard_functions.md)
+  : Hazard Function Calculations
+- [`hazard_properties()`](https://johngavin.github.io/millsratio/reference/hazard_properties.md)
+  : Hazard Function Properties
 - [`launch_dashboard()`](https://johngavin.github.io/millsratio/reference/launch_dashboard.md)
   : Launch Mills Ratio Interactive Dashboard
 - [`launch_dashboard_no_browser()`](https://johngavin.github.io/millsratio/reference/launch_dashboard_no_browser.md)
