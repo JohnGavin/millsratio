@@ -52,12 +52,9 @@ For a fully reproducible environment with all dependencies:
 git clone https://github.com/JohnGavin/millsratio.git
 cd millsratio
 
-# Generate Nix environment from DESCRIPTION
-Rscript default.R  # Creates default.nix
-
-# Enter Nix shell with GC root (fast after first run)
+# Enter Nix shell with GC root (creates default.nix automatically)
 chmod +x default.sh
-./default.sh
+./default.sh  # First run: builds environment, subsequent runs: fast
 
 # Now in Nix shell, R has all dependencies
 R

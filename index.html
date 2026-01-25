@@ -94,16 +94,13 @@
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/JohnGavin/millsratio.git</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="bu">cd</span> millsratio</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Generate Nix environment from DESCRIPTION</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">Rscript</span> default.R  <span class="co"># Creates default.nix</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># Enter Nix shell with GC root (fast after first run)</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">chmod</span> +x default.sh</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="ex">./default.sh</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Now in Nix shell, R has all dependencies</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="ex">R</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="op">&gt;</span> library<span class="kw">(</span><span class="ex">millsratio</span><span class="kw">)</span></span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Enter Nix shell with GC root (creates default.nix automatically)</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">chmod</span> +x default.sh</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="ex">./default.sh</span>  <span class="co"># First run: builds environment, subsequent runs: fast</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># Now in Nix shell, R has all dependencies</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="ex">R</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="op">&gt;</span> library<span class="kw">(</span><span class="ex">millsratio</span><span class="kw">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-with-rix">Using with rix<a class="anchor" aria-label="anchor" href="#using-with-rix"></a>
