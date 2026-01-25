@@ -28,7 +28,6 @@ Suggests:
     scales,
     shinylive,
     testthat (>= 3.0.0)
-VignetteBuilder: quarto, knitr
 Config/testthat/edition: 3
 URL: https://johngavin.github.io/millsratio/, https://github.com/JohnGavin/millsratio
 BugReports: https://github.com/JohnGavin/millsratio/issues
