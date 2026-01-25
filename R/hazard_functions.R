@@ -171,8 +171,8 @@ hazard_properties <- function(distribution = "normal", df = NULL) {
       "Non-monotonic"
     },
     asymptotic_behavior = switch(distribution,
-      normal = "h(x) ~ x as x → ∞",
-      t = paste0("h(x) ~ ", df + 1, "/", df, "/x as x → ∞"),
+      normal = "h(x) ~ x as x -> Inf",
+      t = paste0("h(x) ~ ", df + 1, "/", df, "/x as x -> Inf"),
       exponential = "h(x) = constant",
       "Unknown"
     ),

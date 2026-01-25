@@ -5,7 +5,7 @@
 \title{Hazard Function Calculations}
 \description{
 Functions for calculating hazard functions and their relationship to Mills ratios.
-The hazard function h(x) = f(x)/\link{1-F(x)} is the reciprocal of the Mills ratio m(x).
+The hazard function h(x) = f(x)/(1-F(x)) is the reciprocal of the Mills ratio m(x).
 }
 \details{
 The hazard function (also called failure rate or force of mortality) represents
