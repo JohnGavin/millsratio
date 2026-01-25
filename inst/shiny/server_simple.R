@@ -125,4 +125,71 @@ server <- function(input, output, session) {
     ) %>%
       formatRound(columns = -1, digits = 4)
   })
+
+  # Hazard Function Page Outputs
+  output$hazard_plot <- renderPlotly({
+    req(input$hazard_dist, input$hazard_range)
+
+    x <- seq(input$hazard_range[1], input$hazard_range[2], length.out = 100)
+
+    # Calculate Mills ratio and hazard
+    if (input$hazard_dist == "normal") {
+      mills <- mills_ratio_normal(x)
+      dist_label <- "Normal"
+    } else if (input$hazard_dist == "exp") {
+      mills <- mills_ratio_exp(x)
+      dist_label <- "Exponential"
+    } else if (grepl("^t", input$hazard_dist)) {
+      df <- as.numeric(sub("^t", "", input$hazard_dist))
+      mills <- mills_ratio_t(x, df = df)
+      dist_label <- paste0("t(", df, ")")
+    }
+
+    hazard <- 1 / mills
+
+    p <- plot_ly()
+
+    if (input$show_both) {
+      # Show both functions
+      p <- p %>%
+        add_trace(x = x, y = mills, name = "Mills ratio m(x)",
+                  type = "scatter", mode = "lines",
+                  line = list(color = "#2c3e50", width = 2)) %>%
+        add_trace(x = x, y = hazard, name = "Hazard h(x) = 1/m(x)",
+                  type = "scatter", mode = "lines",
+                  line = list(color = "#e74c3c", width = 2, dash = "dash"))
+
+      y_title <- "Value"
+    } else {
+      # Show only hazard
+      p <- p %>%
+        add_trace(x = x, y = hazard, name = "Hazard h(x)",
+                  type = "scatter", mode = "lines",
+                  line = list(color = "#e74c3c", width = 2))
+
+      y_title <- "Hazard h(x)"
+    }
+
+    p %>% layout(
+      title = paste(dist_label, "Distribution"),
+      xaxis = list(title = "x"),
+      yaxis = list(title = y_title, type = "log"),
+      hovermode = "x unified",
+      legend = list(orientation = "h", y = -0.2)
+    )
+  })
+
+  output$hazard_properties <- renderText({
+    req(input$hazard_dist)
+
+    if (input$hazard_dist == "normal") {
+      "Normal: Increasing hazard (IFR) - aging effect. As x increases, failure becomes more likely."
+    } else if (input$hazard_dist == "exp") {
+      "Exponential: Constant hazard (CFR) - memoryless property. Failure rate doesn't depend on age."
+    } else if (input$hazard_dist == "t3") {
+      "t(3): Eventually decreasing hazard - heavy tails. Extreme events become relatively less likely."
+    } else if (input$hazard_dist == "t30") {
+      "t(30): Nearly normal centrally, but decreasing hazard in tails due to heavier tails than normal."
+    }
+  })
 }

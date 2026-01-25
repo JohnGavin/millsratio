@@ -1,0 +1,118 @@
+---
+title: "millsratio: Mills Ratio Analysis in R"
+subtitle: "Exploring tail thickness through Mills ratios and hazard functions"
+format:
+  html:
+    toc: false
+---
+
+## Welcome
+
+The `millsratio` package provides tools for analyzing and comparing Mills ratios across different distributions, revealing insights into tail thickness and extreme event probabilities.
+
+## Key Features
+
+:::: {.columns}
+::: {.column width="50%"}
+### Core Functions
+- Calculate Mills ratios for multiple distributions
+- Hazard function calculations
+- Tail thickness analysis
+- Interactive visualizations
+:::
+
+::: {.column width="50%"}
+### Interactive Dashboard
+- Explore Mills ratios interactively
+- Compare distributions side-by-side
+- Understand the hazard function connection
+- Tidyverse code examples
+:::
+::::
+
+## Quick Start
+
+```{r}
+#| eval: false
+# Install from GitHub
+remotes::install_github("JohnGavin/millsratio")
+
+# Load the package
+library(millsratio)
+library(tidyverse)
+
+# Calculate Mills ratios
+x <- seq(0.1, 5, by = 0.1)
+tibble(x = x) %>%
+  mutate(
+    mills_normal = mills_ratio_normal(x),
+    mills_t30 = mills_ratio_t(x, df = 30),
+    mills_exp = mills_ratio_exp(x)
+  ) %>%
+  pivot_longer(-x, names_to = "distribution", values_to = "mills_ratio")
+```
+
+## The t(30) Paradox
+
+A key finding illustrated by this package:
+
+> The t-distribution with 30 degrees of freedom appears nearly normal in the center but has substantially fatter tails, with the Mills ratio diverging increasingly at extreme values.
+
+```{r}
+#| eval: false
+# Demonstrate the t(30) paradox
+analyze_t30_paradox() %>%
+  filter(x %in% c(1, 2, 3, 4)) %>%
+  select(x, mills_ratio)
+```
+
+## Interactive Dashboard
+
+Launch the interactive dashboard to explore Mills ratios and hazard functions:
+
+```{r}
+#| eval: false
+# Launch the dashboard
+launch_dashboard_simple()
+```
+
+Or try the web version (no R installation required):
+
+<iframe src="shinylive/index.html" width="100%" height="600px"></iframe>
+
+## Mathematical Foundation
+
+The Mills ratio is defined as:
+
+$$m(x) = \frac{1 - F(x)}{f(x)} = \frac{\bar{F}(x)}{f(x)}$$
+
+where:
+- $f(x)$ is the probability density function
+- $F(x)$ is the cumulative distribution function
+- $\bar{F}(x) = 1 - F(x)$ is the survival function
+
+The hazard function is the reciprocal:
+
+$$h(x) = \frac{1}{m(x)} = \frac{f(x)}{\bar{F}(x)}$$
+
+## Learn More
+
+- [Mathematical Theory](articles/theory.qmd)
+- [Applications in Practice](articles/applications.qmd)
+- [Hazard Function Connection](articles/hazard-connection.qmd)
+- [Performance Benchmarks](articles/benchmarks.qmd)
+
+## Citation
+
+If you use this package, please cite:
+
+```bibtex
+@software{millsratio2026,
+  author = {Gavin, John},
+  title = {millsratio: Mills Ratio Analysis in R},
+  year = {2026},
+  url = {https://github.com/JohnGavin/millsratio}
+}
+```
+
+Based on insights from [John D. Cook's blog post](https://www.johndcook.com/blog/2026/01/21/mills-ratio/) on Mills ratios and tail thickness.

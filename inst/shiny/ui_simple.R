@@ -161,6 +161,168 @@ ui <- page_navbar(
     )
   ),
 
+  # Hazard Function Page
+  nav_panel(
+    title = "Hazard Function",
+    icon = icon("heartbeat"),
+
+    layout_columns(
+      col_widths = c(12),
+
+      card(
+        card_header("Mills Ratio and Hazard Function Connection"),
+        card_body(
+          h4("Mathematical Relationship"),
+          p("The hazard function is the reciprocal of the Mills ratio:"),
+          p("$$h(x) = \\frac{f(x)}{1 - F(x)} = \\frac{f(x)}{\\bar{F}(x)} = \\frac{1}{m(x)}$$"),
+
+          p("Where:"),
+          tags$ul(
+            tags$li("\\(h(x)\\) = hazard function (instantaneous failure rate)"),
+            tags$li("\\(m(x)\\) = Mills ratio"),
+            tags$li("\\(f(x)\\) = probability density function"),
+            tags$li("\\(\\bar{F}(x) = 1 - F(x)\\) = survival function")
+          ),
+
+          h4("Interpretation"),
+          p("The hazard function represents the instantaneous rate of occurrence at time \\(x\\), given survival up to time \\(x\\)."),
+          p("In survival analysis: probability of death in next instant, given survival to now."),
+          p("In reliability: probability of failure in next instant, given functioning until now.")
+        )
+      ),
+
+      card(
+        card_header("Interactive Comparison"),
+        card_body(
+          layout_columns(
+            col_widths = c(4, 8),
+
+            div(
+              selectInput("hazard_dist", "Distribution:",
+                         choices = c("Normal" = "normal",
+                                   "t(3)" = "t3",
+                                   "t(30)" = "t30",
+                                   "Exponential" = "exp"),
+                         selected = "normal"),
+
+              sliderInput("hazard_range", "X Range:",
+                         min = 0.1, max = 10, value = c(0.5, 5),
+                         step = 0.1),
+
+              checkboxInput("show_both", "Show both functions", TRUE),
+
+              hr(),
+
+              h5("Properties"),
+              textOutput("hazard_properties")
+            ),
+
+            plotlyOutput("hazard_plot", height = "400px")
+          ),
+
+          tags$small(class = "text-muted",
+                    "Figure: Mills ratio m(x) and hazard function h(x) = 1/m(x).")
+        )
+      ),
+
+      card(
+        card_header("Tidyverse Code Examples"),
+        card_body(
+          h4("Calculate hazard from Mills ratio"),
+          pre(code = 'library(tidyverse)
+library(millsratio)
+
+# Method 1: Using Mills ratio
+df <- tibble(x = seq(0.1, 5, by = 0.1)) %>%
+  mutate(
+    mills_ratio = mills_ratio_normal(x),
+    hazard = 1 / mills_ratio  # h(x) = 1/m(x)
+  )
+
+# Method 2: Direct calculation
+df <- tibble(x = seq(0.1, 5, by = 0.1)) %>%
+  mutate(
+    pdf = dnorm(x),
+    survival = pnorm(x, lower.tail = FALSE),
+    hazard = pdf / survival
+  )'),
+
+          h4("Compare across distributions"),
+          pre(code = '# Compare hazard functions
+results <- tibble(x = seq(0.1, 5, by = 0.1)) %>%
+  mutate(
+    Normal = hazard_function(x, "normal"),
+    `t(30)` = hazard_function(x, "t", df = 30),
+    Exponential = hazard_function(x, "exponential")
+  ) %>%
+  pivot_longer(-x, names_to = "distribution", values_to = "hazard")
+
+# Visualize
+ggplot(results, aes(x, hazard, color = distribution)) +
+  geom_line(linewidth = 1) +
+  scale_y_log10() +
+  labs(title = "Hazard Function Comparison",
+       y = "h(x) (log scale)")'),
+
+          h4("Analyze hazard properties"),
+          pre(code = '# Check if hazard is increasing (IFR)
+df %>%
+  arrange(x) %>%
+  mutate(
+    hazard_diff = hazard - lag(hazard),
+    is_increasing = hazard_diff > 0
+  ) %>%
+  summarize(
+    all_increasing = all(is_increasing, na.rm = TRUE)
+  )
+# TRUE for normal (aging), FALSE for t (heavy tails)')
+        )
+      ),
+
+      card(
+        card_header("Applications"),
+        card_body(
+          h4("Survival Analysis"),
+          p("In medical studies, h(x) represents the instantaneous death rate at age x."),
+
+          h4("Reliability Engineering"),
+          p("For component lifetimes, h(x) is the failure rate at time x."),
+
+          h4("Financial Risk"),
+          p("In credit risk, h(x) models the default intensity at time x."),
+
+          h4("Distribution Classification by Hazard"),
+          tags$table(class = "table table-sm",
+            tags$thead(
+              tags$tr(
+                tags$th("Distribution"),
+                tags$th("Hazard Behavior"),
+                tags$th("Interpretation")
+              )
+            ),
+            tags$tbody(
+              tags$tr(
+                tags$td("Normal"),
+                tags$td("Increasing (IFR)"),
+                tags$td("Aging effect")
+              ),
+              tags$tr(
+                tags$td("Exponential"),
+                tags$td("Constant (CFR)"),
+                tags$td("Memoryless")
+              ),
+              tags$tr(
+                tags$td("t-distribution"),
+                tags$td("Eventually decreasing"),
+                tags$td("Heavy tails")
+              )
+            )
+          )
+        )
+      )
+    )
+  ),
+
   # R Code Examples
   nav_panel(
     title = "R Code",

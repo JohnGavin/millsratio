@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "millsratio"
+  description: "R package for Mills ratio analysis and tail thickness comparison"
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Theory"
+        href: articles/theory.qmd
+      - text: "Applications"
+        href: articles/applications.qmd
+      - text: "Dashboard"
+        href: articles/dashboard.qmd
+      - text: "Reference"
+        href: reference/index.qmd
+    right:
+      - icon: github
+        href: https://github.com/JohnGavin/millsratio
+  sidebar:
+    - title: "Articles"
+      contents:
+        - articles/theory.qmd
+        - articles/applications.qmd
+        - articles/hazard-connection.qmd
+        - articles/benchmarks.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+
+execute:
+  freeze: auto
+
+bibliography: references.bib
