@@ -14,3 +14,10 @@
 ^result$
 ^issue_number\.txt$
 ^plans$
+^_common\.R$
+^_freeze$
+^_quarto\.yml$
+^index\.qmd$
+^pkgdown\.yml$
+^pr_number\.txt$
+^references\.bib$
