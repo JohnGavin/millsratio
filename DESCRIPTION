@@ -18,8 +18,9 @@ Imports:
     shiny,
     stats,
     tidyr
-Suggests: 
+Suggests:
     covr,
+    gt,
     htmlwidgets,
     knitr,
     rmarkdown,
