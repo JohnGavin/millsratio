@@ -13,7 +13,7 @@ format:
 ```{r setup}
 #| message: false
 #| warning: false
-library(millsratio)
+devtools::load_all(quiet = TRUE)
 library(tidyverse)
 library(plotly)
 library(DT)
@@ -185,13 +185,13 @@ hazard_data <- tibble(x = seq(0.5, 5, by = 0.1)) %>%
   ) %>%
   pivot_longer(
     -x,
-    names_to = c("function", "distribution"),
+    names_to = c("func_type", "distribution"),
     names_sep = "_",
     values_to = "value"
   )
 
 p_hazard <- hazard_data %>%
-  ggplot(aes(x, value, color = interaction(function, distribution))) +
+  ggplot(aes(x, value, color = interaction(func_type, distribution))) +
   geom_line(size = 1) +
   scale_y_log10() +
   labs(
@@ -226,7 +226,7 @@ The dashboard includes ready-to-copy tidyverse code:
 ### Basic Mills Ratio Calculation
 
 ```r
-library(millsratio)
+devtools::load_all(quiet = TRUE)
 library(tidyverse)
 
 # Calculate and compare Mills ratios

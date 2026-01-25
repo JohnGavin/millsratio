@@ -12,10 +12,10 @@ format:
 ```{r setup}
 #| message: false
 #| warning: false
-library(millsratio)
+devtools::load_all(quiet = TRUE)
 library(tidyverse)
 library(plotly)
-library(gt)
+library(gt)  # Now available in Nix environment
 ```
 
 ## Mathematical Relationship

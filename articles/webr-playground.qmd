@@ -102,7 +102,9 @@ cat("- analyze_t30_paradox()\n")
 
 ## Welcome to the WebR Playground! 🎮
 
-This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required! All the millsratio functions are pre-loaded and ready to use.
+This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
+
+**Note:** Since millsratio is not available on CRAN, the core functions have been manually defined in this page's setup. This includes `mills_ratio_normal()`, `mills_ratio_t()`, `mills_ratio_exp()`, and related functions.
 
 ## Quick Start Examples
 
