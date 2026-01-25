@@ -2,9 +2,13 @@
 
 export(analyze_t30_paradox)
 export(analyze_tail_thickness)
+export(compare_mills_hazard)
 export(compare_mills_ratios)
 export(dashboard_about)
 export(find_crossover_point)
+export(hazard_from_mills)
+export(hazard_function)
+export(hazard_properties)
 export(launch_dashboard)
 export(launch_dashboard_no_browser)
 export(launch_dashboard_simple)

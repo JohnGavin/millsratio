@@ -1,5 +1,5 @@
 # Mills Ratio Package - Targets Pipeline
-# This pipeline ensures all examples are tested and documentation is generated
+# This pipeline uses modular plans for simulations and analysis
 
 library(targets)
 library(tarchetypes)
@@ -10,26 +10,44 @@ tar_option_set(
   format = "rds"
 )
 
-# Source functions if needed
-# tar_source()
+# Source modular plans
+tar_source("R/tar_plans")
 
+# Combine all plans into one pipeline
 list(
+  #============================================================================
+  # MODULAR PLANS: Mills Ratio Simulations & Hazard Analysis
+  #============================================================================
+  
+  plan_mills_simulation,
+  plan_hazard_analysis,
+  
+  #============================================================================
+  # PACKAGE EXAMPLES: Test all exported functions
+  #============================================================================
+  
   # Track raw source files
   tar_target(
     name = mills_ratio_source,
-    command = readLines("R/mills_ratio.R"),
+    command = "R/mills_ratio.R",
     format = "file"
   ),
 
   tar_target(
     name = simulation_source,
-    command = readLines("R/simulation.R"),
+    command = "R/simulation.R",
     format = "file"
   ),
 
   tar_target(
     name = visualization_source,
-    command = readLines("R/visualization.R"),
+    command = "R/visualization.R",
+    format = "file"
+  ),
+
+  tar_target(
+    name = hazard_source,
+    command = "R/hazard_functions.R",
     format = "file"
   ),
 
@@ -146,6 +164,10 @@ list(
     }
   ),
 
+  #============================================================================
+  # VALIDATION: Verify all examples work
+  #============================================================================
+  
   # Test that all examples succeeded
   tar_target(
     name = all_examples_passed,
@@ -171,7 +193,35 @@ list(
       TRUE
     }
   ),
+  
+  # Validate modular plans produced results
+  tar_target(
+    name = plans_validation,
+    command = {
+      checks <- list(
+        mills_data_exists = nrow(mills_data) > 0,
+        mills_summary_exists = nrow(mills_summary) > 0,
+        mills_behavior_exists = nrow(mills_behavior) > 0,
+        hazard_data_exists = nrow(hazard_data) > 0,
+        hazard_properties_exists = nrow(hazard_properties) > 0,
+        hazard_plot_exists = inherits(hazard_plot, "gg"),
+        hazard_interactive_exists = inherits(hazard_interactive, "plotly")
+      )
+      
+      if (!all(unlist(checks))) {
+        failed <- names(checks)[!unlist(checks)]
+        stop("Plan validation failed: ", paste(failed, collapse = ", "))
+      }
+      
+      message("All modular plans validated successfully!")
+      TRUE
+    }
+  ),
 
+  #============================================================================
+  # DOCUMENTATION: Generate README and run checks
+  #============================================================================
+  
   # Generate README from Quarto
   tar_quarto(
     name = readme,
