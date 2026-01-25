@@ -3,12 +3,12 @@ title: "millsratio: Interactive Analysis of Mills Ratios and Tail Thickness"
 format: gfm
 execute:
   echo: true
-  eval: true
+  eval: false
   warning: false
   message: false
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval=FALSE}
 library(millsratio)
 library(ggplot2)
 library(targets)
@@ -44,12 +44,53 @@ where F(x) is the CDF and f(x) is the PDF.
 
 ## Installation
 
+### From GitHub (Standard R)
+
 ```r
-# Install from local directory (development)
-devtools::install("path/to/millsratio")
+# Install development version from GitHub
+remotes::install_github("JohnGavin/millsratio")
 
 # Load the package
 library(millsratio)
+```
+
+### From Nix (Reproducible Environment)
+
+For a fully reproducible environment with all dependencies:
+
+```bash
+# Clone and use the project's Nix shell
+git clone https://github.com/JohnGavin/millsratio.git
+cd millsratio
+
+# Generate Nix environment from DESCRIPTION
+Rscript default.R  # Creates default.nix
+
+# Enter Nix shell with GC root (fast after first run)
+chmod +x default.sh
+./default.sh
+
+# Now in Nix shell, R has all dependencies
+R
+> library(millsratio)
+```
+
+### Using with rix
+
+For integration with existing R projects:
+
+```r
+library(rix)
+rix(
+  r_ver = "4.5.0",
+  r_pkgs = c("tidyverse", "plotly", "shiny"),
+  git_pkgs = list(
+    millsratio = "JohnGavin/millsratio"
+  ),
+  ide = "code",
+  project_path = "."
+)
+# Then: nix-shell
 ```
 
 ## Quick Start
@@ -70,7 +111,7 @@ The dashboard provides:
 
 ### Basic Usage
 
-```{r basic_example}
+```{r basic_example, eval=FALSE}
 # Calculate Mills ratio for normal distribution
 x <- seq(1, 5, by = 0.5)
 m_normal <- mills_ratio_normal(x)
@@ -88,7 +129,7 @@ print(comparison)
 
 ### Visualize the Comparison
 
-```{r visualization, fig.width=8, fig.height=5}
+```{r visualization, fig.width=8, fig.height=5, eval=FALSE}
 # Generate curves for visualization
 curves <- simulate_mills_curves(
   x_range = c(0.5, 5),
@@ -101,7 +142,7 @@ plot_mills_curves(curves, log_y = TRUE)
 
 ### The t(30) Paradox
 
-```{r paradox}
+```{r paradox, eval=FALSE}
 # Analyze the t(30) paradox
 paradox_data <- analyze_t30_paradox(x_range = c(0, 5), n_points = 100)
 
@@ -114,7 +155,7 @@ for (i in seq_along(x_vals)) {
 }
 ```
 
-```{r paradox_plot, fig.width=8, fig.height=5}
+```{r paradox_plot, fig.width=8, fig.height=5, eval=FALSE}
 # Visualize the paradox
 plot_t30_paradox(paradox_data, focus = "mills")
 ```
@@ -169,7 +210,7 @@ The t(30) distribution is often considered "practically normal" for many applica
 
 ### Example 1: Verify Mills Ratio Properties
 
-```{r properties}
+```{r properties, eval=FALSE}
 # Verify that normal has decreasing Mills ratio (thin tails)
 x <- seq(1, 5, by = 0.5)
 m <- mills_ratio_normal(x)
@@ -201,7 +242,7 @@ p  # Opens interactive plotly visualization
 
 ### Example 3: Monte Carlo Verification
 
-```{r monte_carlo}
+```{r monte_carlo, eval=FALSE}
 # Verify Mills ratio empirically
 set.seed(123)
 mc_result <- monte_carlo_mills(
@@ -255,6 +296,32 @@ Implementation support: Claude Assistant
 
 - Cook, J. D. (2026). "Mills Ratio and Tail Thickness." [Blog post](https://www.johndcook.com/blog/2026/01/21/mills-ratio/)
 - Mills, J. P. (1926). "Table of the ratio: Area to bounding ordinate, for any portion of normal curve." Biometrika, 18(3/4), 395-400.
+
+## Project Structure
+
+```{r project-structure, eval=FALSE, echo=FALSE, comment=""}
+# Auto-generate project tree
+suppressMessages(library(fs))
+
+# Use fs::dir_tree for cleaner output
+tree_output <- capture.output(
+  fs::dir_tree(
+    path = ".",
+    recurse = TRUE,
+    type = "any",
+    regexp = "^[^._]",  # Exclude hidden and _ prefixed
+    max_depth = 3
+  )
+)
+
+# Filter out common build artifacts and large directories
+tree_output <- tree_output[!grepl(
+  "nix-shell-root|docs/|man/|Meta/|help/|inst/doc|default\\.nix|renv/|_targets/",
+  tree_output
+)]
+
+cat(tree_output, sep = "\n")
+```
 
 ## Citation
 

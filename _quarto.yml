@@ -15,6 +15,8 @@ website:
         href: articles/applications.qmd
       - text: "Dashboard"
         href: articles/dashboard.qmd
+      - text: "WebR Playground"
+        href: articles/webr-playground.qmd
       - text: "Reference"
         href: reference/index.qmd
     right:
@@ -26,6 +28,8 @@ website:
         - articles/theory.qmd
         - articles/applications.qmd
         - articles/hazard-connection.qmd
+        - articles/dashboard.qmd
+        - articles/webr-playground.qmd
         - articles/benchmarks.qmd
 
 format:
