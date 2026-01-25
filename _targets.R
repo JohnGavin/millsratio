@@ -21,6 +21,7 @@ list(
   
   plan_mills_simulation,
   plan_hazard_analysis,
+  documentation_plan,
   
   #============================================================================
   # PACKAGE EXAMPLES: Test all exported functions
@@ -221,13 +222,9 @@ list(
   #============================================================================
   # DOCUMENTATION: Generate README and run checks
   #============================================================================
-  
-  # Generate README from Quarto
-  tar_quarto(
-    name = readme,
-    path = "README.qmd",
-    quiet = FALSE
-  ),
+
+  # Note: README generation is now handled by documentation_plan
+  # which includes proper dependency tracking for all vignettes
 
   # Run package tests
   tar_target(
