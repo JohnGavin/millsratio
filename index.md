@@ -17,7 +17,9 @@ ratios](https://www.johndcook.com/blog/2026/01/21/mills-ratio/).
 
 The Mills ratio is defined as:
 
-    m(x) = [1 - F(x)] / f(x)
+``` R
+m(x) = [1 - F(x)] / f(x)
+```
 
 where F(x) is the CDF and f(x) is the PDF.
 
@@ -31,12 +33,53 @@ where F(x) is the CDF and f(x) is the PDF.
 
 ## Installation
 
+### From GitHub (Standard R)
+
 ``` r
-# Install from local directory (development)
-devtools::install("path/to/millsratio")
+# Install development version from GitHub
+remotes::install_github("JohnGavin/millsratio")
 
 # Load the package
 library(millsratio)
+```
+
+### From Nix (Reproducible Environment)
+
+For a fully reproducible environment with all dependencies:
+
+``` bash
+# Clone and use the project's Nix shell
+git clone https://github.com/JohnGavin/millsratio.git
+cd millsratio
+
+# Generate Nix environment from DESCRIPTION
+Rscript default.R  # Creates default.nix
+
+# Enter Nix shell with GC root (fast after first run)
+chmod +x default.sh
+./default.sh
+
+# Now in Nix shell, R has all dependencies
+R
+> library(millsratio)
+```
+
+### Using with rix
+
+For integration with existing R projects:
+
+``` r
+library(rix)
+rix(
+  r_ver = "4.5.0",
+  r_pkgs = c("tidyverse", "plotly", "shiny"),
+  git_pkgs = list(
+    millsratio = "JohnGavin/millsratio"
+  ),
+  ide = "code",
+  project_path = "."
+)
+# Then: nix-shell
 ```
 
 ## Quick Start
@@ -59,20 +102,28 @@ demonstration - Custom code playground for experiments
 # Calculate Mills ratio for normal distribution
 x <- seq(1, 5, by = 0.5)
 m_normal <- mills_ratio_normal(x)
+print(round(m_normal, 3))
 
 # Calculate for t-distribution
 m_t30 <- mills_ratio_t(x, df = 30)
+print(round(m_t30, 3))
 
 # Compare distributions
-comparison <- compare_mills_ratios(x, c("normal", "t30", "exponential"))
+x_compare <- c(1, 2, 3, 4)
+comparison <- compare_mills_ratios(x_compare, c("normal", "t30", "exponential"))
 print(comparison)
+```
 
-# Visualize the comparison
-library(ggplot2)
+### Visualize the Comparison
+
+``` r
+# Generate curves for visualization
 curves <- simulate_mills_curves(
   x_range = c(0.5, 5),
   distributions = c("normal", "t30", "exponential")
 )
+
+# Create plot
 plot_mills_curves(curves, log_y = TRUE)
 ```
 
@@ -80,15 +131,20 @@ plot_mills_curves(curves, log_y = TRUE)
 
 ``` r
 # Analyze the t(30) paradox
-paradox_data <- analyze_t30_paradox()
-
-# Visualize the paradox
-plot_t30_paradox(paradox_data, focus = "mills")
+paradox_data <- analyze_t30_paradox(x_range = c(0, 5), n_points = 100)
 
 # Show how t(30) diverges from normal in the tails
 x_vals <- c(1, 2, 3, 4, 5)
 ratio <- mills_ratio_t(x_vals, df = 30) / mills_ratio_normal(x_vals)
-print(ratio)  # Shows increasing divergence
+cat("t(30)/Normal Mills ratio divergence:\n")
+for (i in seq_along(x_vals)) {
+  cat(sprintf("x = %d: ratio = %.3f\n", x_vals[i], ratio[i]))
+}
+```
+
+``` r
+# Visualize the paradox
+plot_t30_paradox(paradox_data, focus = "mills")
 ```
 
 ## Main Functions
@@ -142,28 +198,6 @@ print(ratio)  # Shows increasing divergence
 - [`launch_dashboard()`](https://johngavin.github.io/millsratio/reference/launch_dashboard.md) -
   Launch interactive Shiny dashboard
 
-## Dashboard Features
-
-### Analysis Section
-
-1.  **Normal Distribution Explorer** - Interactive exploration with
-    asymptotic approximations
-2.  **Student’s t Comparison** - Animate through different degrees of
-    freedom
-3.  **Distribution Battle Arena** - Side-by-side comparisons
-4.  **Tail Thickness Analyzer** - Heatmap visualization of tail behavior
-5.  **t(30) Paradox** - Deep dive into the paradox
-
-### Theory Section
-
-6.  **Living Definitions** - Interactive mathematical concepts
-7.  **Asymptotic Playground** - Explore approximation accuracy
-
-### Playground Section
-
-8.  **Custom Analysis** - Write and run your own R code
-9.  **Quick Reference** - Function reference and code templates
-
 ## Mathematical Background
 
 ### Asymptotic Behavior
@@ -190,15 +224,15 @@ underestimate tail probabilities
 # Verify that normal has decreasing Mills ratio (thin tails)
 x <- seq(1, 5, by = 0.5)
 m <- mills_ratio_normal(x)
-all(diff(m) < 0)  # TRUE
+cat("Normal Mills ratio decreasing:", all(diff(m) < 0), "\n")
 
 # Verify that t(3) has increasing Mills ratio (fat tails)
 m_t <- mills_ratio_t(x, df = 3)
-all(diff(m_t) > 0)  # TRUE
+cat("t(3) Mills ratio increasing:", all(diff(m_t) > 0), "\n")
 
 # Verify exponential has constant Mills ratio
 m_exp <- mills_ratio_exp(x)
-all(abs(diff(m_exp)) < 1e-10)  # TRUE
+cat("Exponential Mills ratio constant:", all(abs(diff(m_exp)) < 1e-10), "\n")
 ```
 
 ### Example 2: Interactive Exploration
@@ -227,9 +261,9 @@ mc_result <- monte_carlo_mills(
   distribution = "normal"
 )
 
-cat("Empirical Mills ratio:", mc_result$empirical_mills, "\n")
-cat("True Mills ratio:", mc_result$true_mills, "\n")
-cat("Relative error:", mc_result$relative_error, "\n")
+cat("Empirical Mills ratio:", round(mc_result$empirical_mills, 4), "\n")
+cat("True Mills ratio:", round(mc_result$true_mills, 4), "\n")
+cat("Relative error:", round(mc_result$relative_error, 4), "\n")
 ```
 
 ## Testing
@@ -246,10 +280,17 @@ Check package:
 devtools::check()
 ```
 
-## Contributing
+## Reproducible Pipeline
 
-Contributions are welcome! Please feel free to submit issues or pull
-requests.
+This package uses `targets` to ensure all examples are tested:
+
+``` r
+# Run the pipeline to test all examples
+targets::tar_make()
+
+# View the pipeline
+targets::tar_visnetwork()
+```
 
 ## License
 
@@ -268,13 +309,17 @@ Implementation support: Claude Assistant
 - Mills, J. P. (1926). “Table of the ratio: Area to bounding ordinate,
   for any portion of normal curve.” Biometrika, 18(3/4), 395-400.
 
+## Project Structure
+
 ## Citation
 
 If you use this package in your research, please cite:
 
-    @software{millsratio2026,
-      author = {Gavin, John},
-      title = {millsratio: Interactive Analysis of Mills Ratios and Tail Thickness},
-      year = {2026},
-      url = {https://github.com/yourusername/millsratio}
-    }
+``` R
+@software{millsratio2026,
+  author = {Gavin, John},
+  title = {millsratio: Interactive Analysis of Mills Ratios and Tail Thickness},
+  year = {2026},
+  url = {https://github.com/yourusername/millsratio}
+}
+```

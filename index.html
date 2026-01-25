@@ -58,7 +58,7 @@
 <h2 id="key-concepts">Key Concepts<a class="anchor" aria-label="anchor" href="#key-concepts"></a>
 </h2>
 <p>The Mills ratio is defined as:</p>
-<pre><code>m(x) = [1 - F(x)] / f(x)</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">m</span>(x) <span class="ot">=</span> [<span class="dv">1</span> <span class="sc">-</span> <span class="fu">F</span>(x)] <span class="sc">/</span> <span class="fu">f</span>(x)</span></code></pre></div>
 <p>where F(x) is the CDF and f(x) is the PDF.</p>
 <div class="section level3">
 <h3 id="what-mills-ratios-reveal">What Mills Ratios Reveal:<a class="anchor" aria-label="anchor" href="#what-mills-ratios-reveal"></a>
@@ -76,12 +76,52 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<div class="section level3">
+<h3 id="from-github-standard-r">From GitHub (Standard R)<a class="anchor" aria-label="anchor" href="#from-github-standard-r"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from local directory (development)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"path/to/millsratio"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Install development version from GitHub</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JohnGavin/millsratio"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load the package</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://johngavin.github.io/millsratio/">millsratio</a></span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="from-nix-reproducible-environment">From Nix (Reproducible Environment)<a class="anchor" aria-label="anchor" href="#from-nix-reproducible-environment"></a>
+</h3>
+<p>For a fully reproducible environment with all dependencies:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Clone and use the project's Nix shell</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/JohnGavin/millsratio.git</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="bu">cd</span> millsratio</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Generate Nix environment from DESCRIPTION</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">Rscript</span> default.R  <span class="co"># Creates default.nix</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># Enter Nix shell with GC root (fast after first run)</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">chmod</span> +x default.sh</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="ex">./default.sh</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Now in Nix shell, R has all dependencies</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="ex">R</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="op">&gt;</span> library<span class="kw">(</span><span class="ex">millsratio</span><span class="kw">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="using-with-rix">Using with rix<a class="anchor" aria-label="anchor" href="#using-with-rix"></a>
+</h3>
+<p>For integration with existing R projects:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rix/" class="external-link">rix</a></span><span class="op">)</span></span>
+<span><span class="fu">rix</span><span class="op">(</span></span>
+<span>  r_ver <span class="op">=</span> <span class="st">"4.5.0"</span>,</span>
+<span>  r_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tidyverse"</span>, <span class="st">"plotly"</span>, <span class="st">"shiny"</span><span class="op">)</span>,</span>
+<span>  git_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    millsratio <span class="op">=</span> <span class="st">"JohnGavin/millsratio"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  ide <span class="op">=</span> <span class="st">"code"</span>,</span>
+<span>  project_path <span class="op">=</span> <span class="st">"."</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Then: nix-shell</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
@@ -89,7 +129,7 @@
 <div class="section level3">
 <h3 id="launch-interactive-dashboard">Launch Interactive Dashboard<a class="anchor" aria-label="anchor" href="#launch-interactive-dashboard"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Launch the interactive dashboard</span></span>
 <span><span class="fu"><a href="reference/launch_dashboard.html">launch_dashboard</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The dashboard provides: - 12 interactive pages organized into Analysis, Theory, and Playground sections - Real-time visualization of Mills ratios - Comparison tools for multiple distributions - The t(30) paradox demonstration - Custom code playground for experiments</p>
@@ -97,40 +137,51 @@
 <div class="section level3">
 <h3 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate Mills ratio for normal distribution</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, by <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">m_normal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_normal.html">mills_ratio_normal</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">m_normal</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate for t-distribution</span></span>
 <span><span class="va">m_t30</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_t.html">mills_ratio_t</a></span><span class="op">(</span><span class="va">x</span>, df <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">m_t30</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compare distributions</span></span>
-<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/compare_mills_ratios.html">compare_mills_ratios</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"normal"</span>, <span class="st">"t30"</span>, <span class="st">"exponential"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualize the comparison</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">x_compare</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/compare_mills_ratios.html">compare_mills_ratios</a></span><span class="op">(</span><span class="va">x_compare</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"normal"</span>, <span class="st">"t30"</span>, <span class="st">"exponential"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="visualize-the-comparison">Visualize the Comparison<a class="anchor" aria-label="anchor" href="#visualize-the-comparison"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Generate curves for visualization</span></span>
 <span><span class="va">curves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_mills_curves.html">simulate_mills_curves</a></span><span class="op">(</span></span>
 <span>  x_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
 <span>  distributions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"normal"</span>, <span class="st">"t30"</span>, <span class="st">"exponential"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create plot</span></span>
 <span><span class="fu"><a href="reference/plot_mills_curves.html">plot_mills_curves</a></span><span class="op">(</span><span class="va">curves</span>, log_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-t30-paradox">The t(30) Paradox<a class="anchor" aria-label="anchor" href="#the-t30-paradox"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Analyze the t(30) paradox</span></span>
-<span><span class="va">paradox_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_t30_paradox.html">analyze_t30_paradox</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualize the paradox</span></span>
-<span><span class="fu"><a href="reference/plot_t30_paradox.html">plot_t30_paradox</a></span><span class="op">(</span><span class="va">paradox_data</span>, focus <span class="op">=</span> <span class="st">"mills"</span><span class="op">)</span></span>
+<span><span class="va">paradox_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_t30_paradox.html">analyze_t30_paradox</a></span><span class="op">(</span>x_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span>, n_points <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Show how t(30) diverges from normal in the tails</span></span>
 <span><span class="va">x_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_t.html">mills_ratio_t</a></span><span class="op">(</span><span class="va">x_vals</span>, df <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="reference/mills_ratio_normal.html">mills_ratio_normal</a></span><span class="op">(</span><span class="va">x_vals</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ratio</span><span class="op">)</span>  <span class="co"># Shows increasing divergence</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"t(30)/Normal Mills ratio divergence:\n"</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">x_vals</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"x = %d: ratio = %.3f\n"</span>, <span class="va">x_vals</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">ratio</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Visualize the paradox</span></span>
+<span><span class="fu"><a href="reference/plot_t30_paradox.html">plot_t30_paradox</a></span><span class="op">(</span><span class="va">paradox_data</span>, focus <span class="op">=</span> <span class="st">"mills"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -202,46 +253,6 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="dashboard-features">Dashboard Features<a class="anchor" aria-label="anchor" href="#dashboard-features"></a>
-</h2>
-<div class="section level3">
-<h3 id="analysis-section">Analysis Section<a class="anchor" aria-label="anchor" href="#analysis-section"></a>
-</h3>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Normal Distribution Explorer</strong> - Interactive exploration with asymptotic approximations</li>
-<li>
-<strong>Student’s t Comparison</strong> - Animate through different degrees of freedom</li>
-<li>
-<strong>Distribution Battle Arena</strong> - Side-by-side comparisons</li>
-<li>
-<strong>Tail Thickness Analyzer</strong> - Heatmap visualization of tail behavior</li>
-<li>
-<strong>t(30) Paradox</strong> - Deep dive into the paradox</li>
-</ol>
-</div>
-<div class="section level3">
-<h3 id="theory-section">Theory Section<a class="anchor" aria-label="anchor" href="#theory-section"></a>
-</h3>
-<ol start="6" style="list-style-type: decimal">
-<li>
-<strong>Living Definitions</strong> - Interactive mathematical concepts</li>
-<li>
-<strong>Asymptotic Playground</strong> - Explore approximation accuracy</li>
-</ol>
-</div>
-<div class="section level3">
-<h3 id="playground-section">Playground Section<a class="anchor" aria-label="anchor" href="#playground-section"></a>
-</h3>
-<ol start="8" style="list-style-type: decimal">
-<li>
-<strong>Custom Analysis</strong> - Write and run your own R code</li>
-<li>
-<strong>Quick Reference</strong> - Function reference and code templates</li>
-</ol>
-</div>
-</div>
-<div class="section level2">
 <h2 id="mathematical-background">Mathematical Background<a class="anchor" aria-label="anchor" href="#mathematical-background"></a>
 </h2>
 <div class="section level3">
@@ -284,24 +295,24 @@
 <div class="section level3">
 <h3 id="example-1-verify-mills-ratio-properties">Example 1: Verify Mills Ratio Properties<a class="anchor" aria-label="anchor" href="#example-1-verify-mills-ratio-properties"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Verify that normal has decreasing Mills ratio (thin tails)</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, by <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_normal.html">mills_ratio_normal</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Normal Mills ratio decreasing:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Verify that t(3) has increasing Mills ratio (fat tails)</span></span>
 <span><span class="va">m_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_t.html">mills_ratio_t</a></span><span class="op">(</span><span class="va">x</span>, df <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m_t</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"t(3) Mills ratio increasing:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m_t</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Verify exponential has constant Mills ratio</span></span>
 <span><span class="va">m_exp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mills_ratio_exp.html">mills_ratio_exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m_exp</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1e-10</span><span class="op">)</span>  <span class="co"># TRUE</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Exponential Mills ratio constant:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">m_exp</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1e-10</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-2-interactive-exploration">Example 2: Interactive Exploration<a class="anchor" aria-label="anchor" href="#example-2-interactive-exploration"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate interactive plot</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plotly-r.com" class="external-link">plotly</a></span><span class="op">)</span></span>
 <span><span class="va">curves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_mills_curves.html">simulate_mills_curves</a></span><span class="op">(</span></span>
@@ -316,7 +327,7 @@
 <div class="section level3">
 <h3 id="example-3-monte-carlo-verification">Example 3: Monte Carlo Verification<a class="anchor" aria-label="anchor" href="#example-3-monte-carlo-verification"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Verify Mills ratio empirically</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">mc_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/monte_carlo_mills.html">monte_carlo_mills</a></span><span class="op">(</span></span>
@@ -325,25 +336,31 @@
 <span>  distribution <span class="op">=</span> <span class="st">"normal"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Empirical Mills ratio:"</span>, <span class="va">mc_result</span><span class="op">$</span><span class="va">empirical_mills</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"True Mills ratio:"</span>, <span class="va">mc_result</span><span class="op">$</span><span class="va">true_mills</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Relative error:"</span>, <span class="va">mc_result</span><span class="op">$</span><span class="va">relative_error</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Empirical Mills ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">mc_result</span><span class="op">$</span><span class="va">empirical_mills</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"True Mills ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">mc_result</span><span class="op">$</span><span class="va">true_mills</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Relative error:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">mc_result</span><span class="op">$</span><span class="va">relative_error</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h2>
 <p>Run the test suite:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Check package:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+<h2 id="reproducible-pipeline">Reproducible Pipeline<a class="anchor" aria-label="anchor" href="#reproducible-pipeline"></a>
 </h2>
-<p>Contributions are welcome! Please feel free to submit issues or pull requests.</p>
+<p>This package uses <code>targets</code> to ensure all examples are tested:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run the pipeline to test all examples</span></span>
+<span><span class="fu">targets</span><span class="fu">::</span><span class="fu">tar_make</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View the pipeline</span></span>
+<span><span class="fu">targets</span><span class="fu">::</span><span class="fu">tar_visnetwork</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -366,15 +383,19 @@
 </ul>
 </div>
 <div class="section level2">
+<h2 id="project-structure">Project Structure<a class="anchor" aria-label="anchor" href="#project-structure"></a>
+</h2>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>If you use this package in your research, please cite:</p>
-<pre><code>@software{millsratio2026,
-  author = {Gavin, John},
-  title = {millsratio: Interactive Analysis of Mills Ratios and Tail Thickness},
-  year = {2026},
-  url = {https://github.com/yourusername/millsratio}
-}</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="sc">@</span>software{millsratio2026,</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  author <span class="ot">=</span> {Gavin, John},</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  title <span class="ot">=</span> {millsratio<span class="sc">:</span> Interactive Analysis of Mills Ratios and Tail Thickness},</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2026</span>},</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>yourusername<span class="sc">/</span>millsratio}</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
