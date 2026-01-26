@@ -14,7 +14,7 @@ bibliography: ../references.bib
 ```{r setup}
 #| message: false
 #| warning: false
-devtools::load_all(quiet = TRUE)
+library(millsratio)
 library(tidyverse)
 library(plotly)
 ```

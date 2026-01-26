@@ -70,7 +70,11 @@ rix(
   r_ver = "4.5.0",
   r_pkgs = c("tidyverse", "plotly", "shiny"),
   git_pkgs = list(
-    millsratio = "JohnGavin/millsratio"
+    millsratio = list(
+      package_source = "github",
+      repo_url = "JohnGavin/millsratio",
+      branch = "main"
+    )
   ),
   ide = "code",
   project_path = "."
