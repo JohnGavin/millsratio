@@ -5,7 +5,7 @@ author: "John Gavin"
 date: today
 format:
   html:
-    code-fold: false
+    code-fold: true
     code-tools: true
     toc: true
 bibliography: ../references.bib

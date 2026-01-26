@@ -1,5 +1,7 @@
 # Interactive Dashboard
 
+Code
+
 ``` r
 library(millsratio)
 library(tidyverse)
@@ -19,6 +21,24 @@ Mills ratios and their relationship to distribution tail thickness:
     ([`launch_dashboard()`](https://johngavin.github.io/millsratio/reference/launch_dashboard.md)) -
     Comprehensive 12-page analysis
 
+> **Running the Dashboard**
+>
+> The dashboards are **interactive Shiny applications** that run locally
+> on your computer. They are not available on the website. To use them:
+>
+> 1.  Install the millsratio package
+> 2.  Run
+>     [`library(millsratio)`](https://johngavin.github.io/millsratio/)
+>     in R
+> 3.  Execute
+>     [`launch_dashboard()`](https://johngavin.github.io/millsratio/reference/launch_dashboard.md)
+>     or
+>     [`launch_dashboard_simple()`](https://johngavin.github.io/millsratio/reference/launch_dashboard_simple.md)
+> 4.  Your browser will open with the interactive dashboard
+>
+> The dashboards require a local R installation and cannot be embedded
+> in static documentation.
+
 ## Dashboard Features
 
 ### Simple Dashboard
@@ -31,6 +51,8 @@ The simplified dashboard focuses on essential functionality:
 - **R Code Page**: Ready-to-use tidyverse examples
 
 Launch it with:
+
+Code
 
 ``` r
 launch_dashboard_simple()
@@ -65,6 +87,8 @@ The comprehensive dashboard is organized into three main sections:
 
 Launch it with:
 
+Code
+
 ``` r
 launch_dashboard()
 ```
@@ -74,6 +98,8 @@ launch_dashboard()
 ### Real-time Visualization
 
 Both dashboards provide instant feedback as you adjust parameters:
+
+Code
 
 ``` r
 # Example of what the dashboard visualizes
@@ -103,6 +129,8 @@ p <- ggplot(data, aes(x, mills_ratio, color = distribution)) +
     Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ℹ Please use `linewidth` instead.
 
+Code
+
 ``` r
 ggplotly(p)
 ```
@@ -110,6 +138,8 @@ ggplotly(p)
 ### Distribution Comparison Table
 
 The dashboards generate comparison tables like this:
+
+Code
 
 ``` r
 # Compare Mills ratios at key points
@@ -137,6 +167,8 @@ comparison %>%
 ### The t(30) Paradox Visualization
 
 A key feature demonstrates why t(30) is dangerous to treat as normal:
+
+Code
 
 ``` r
 # Analyze the paradox
@@ -172,6 +204,8 @@ ggplotly(p_paradox)
 
 The dashboard explores the reciprocal relationship between Mills ratio
 and hazard function:
+
+Code
 
 ``` r
 # Show both functions together

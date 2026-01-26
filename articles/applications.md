@@ -1,5 +1,7 @@
 # Practical Applications of Mills Ratios
 
+Code
+
 ``` r
 library(millsratio)
 library(tidyverse)
@@ -18,6 +20,8 @@ with working examples.
 
 In risk management, the Mills ratio helps calculate expected losses
 beyond VaR:
+
+Code
 
 ``` r
 # Portfolio with normal returns
@@ -40,6 +44,8 @@ cat("ES/VaR ratio:", round(expected_shortfall / (mu + sigma * z_var), 2))
 ### Option Pricing
 
 Mills ratios appear in exotic option formulas:
+
+Code
 
 ``` r
 # Digital option delta using Mills ratio
@@ -70,6 +76,8 @@ digital_delta(S, K, r, sigma, T)
 For components with lifetime distribution, the mean residual life at age
 $`t`$ is:
 
+Code
+
 ``` r
 # Mean residual life function
 mean_residual_life <- function(t, distribution = "normal", ...) {
@@ -98,6 +106,8 @@ data.frame(
 ### System Reliability
 
 For series systems with component lifetimes:
+
+Code
 
 ``` r
 # Series system with n components
@@ -128,6 +138,8 @@ series_system_mills(x = 2, n_components = 5)
 
 In Tobit models and truncated regression:
 
+Code
+
 ``` r
 # Heckman correction using Mills ratio
 heckman_correction <- function(z_scores) {
@@ -157,6 +169,8 @@ abline(v = 0, lty = 2)
 ### Survival Analysis
 
 Mills ratio in survival probability calculations:
+
+Code
 
 ``` r
 # Survival function using Mills ratio
@@ -195,6 +209,8 @@ ggplot(plot_data, aes(time, Survival, color = Distribution)) +
 
 Mills ratio in capability indices:
 
+Code
+
 ``` r
 # Enhanced process capability using Mills ratio
 process_capability_mills <- function(USL, LSL, mu, sigma) {
@@ -231,6 +247,8 @@ process_capability_mills(USL = 6, LSL = -6, mu = 0, sigma = 1)
 ### Outlier Detection
 
 Using Mills ratio for anomaly scores:
+
+Code
 
 ``` r
 # Anomaly score based on Mills ratio
@@ -278,6 +296,8 @@ abline(h = threshold, lty = 2, col = "red")
 ## Insurance and Actuarial Science
 
 ### Excess-of-Loss Pricing
+
+Code
 
 ``` r
 # Reinsurance premium calculation

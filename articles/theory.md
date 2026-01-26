@@ -1,5 +1,7 @@
 # Mathematical Theory of Mills Ratios
 
+Code
+
 ``` r
 library(millsratio)
 library(tidyverse)
@@ -36,6 +38,8 @@ m(x) \sim \frac{1}{x} - \frac{1}{x^3} + \frac{3}{x^5} - \cdots
 ```
 
 The leading term $`1/x`$ dominates, indicating thin tails.
+
+Code
 
 ``` r
 x <- seq(2, 10, by = 0.5)
@@ -83,6 +87,8 @@ Mills ratio:
 ```
 
 These bounds become tighter as $`x`$ increases.
+
+Code
 
 ``` r
 x <- seq(1, 5, by = 0.1)
@@ -158,6 +164,8 @@ values - Peaks over threshold models
 ### Numerical Stability
 
 For large $`x`$, direct computation can be unstable. Use:
+
+Code
 
 ``` r
 # Unstable for large x

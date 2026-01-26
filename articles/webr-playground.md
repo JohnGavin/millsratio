@@ -1,34 +1,17 @@
 # Interactive WebR Playground
 
-    Mills ratio functions loaded successfully!
-
-    Available functions:
-
-    - mills_ratio_normal(x)
-
-    - mills_ratio_t(x, df)
-
-    - mills_ratio_exp(x)
-
-    - hazard_from_mills(mills_ratio)
-
-    - hazard_function(x, distribution, ...)
-
-    - compare_mills_hazard(x, distribution, ...)
-
-    - analyze_t30_paradox()
-
 ## Welcome to the WebR Playground! 🎮
 
 This interactive environment lets you run Mills ratio examples directly
 in your browser - no R installation required!
 
-**Note:** Since millsratio is not available on CRAN, the core functions
-have been manually defined in this page’s setup. This includes
-[`mills_ratio_normal()`](https://johngavin.github.io/millsratio/reference/mills_ratio_normal.md),
-[`mills_ratio_t()`](https://johngavin.github.io/millsratio/reference/mills_ratio_t.md),
-[`mills_ratio_exp()`](https://johngavin.github.io/millsratio/reference/mills_ratio_exp.md),
-and related functions.
+### Initialize Functions (Run First!)
+
+**Important:** Click “Run Code” below to load the Mills ratio functions
+before trying the examples:
+
+Please enable JavaScript to experience the dynamic code cell content on
+this page.
 
 ## Quick Start Examples
 
