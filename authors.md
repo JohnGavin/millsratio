@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/JohnGavin/millsratio/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/JohnGavin/millsratio/blob/HEAD/DESCRIPTION)
 
 Gavin J (2026). *millsratio: Interactive Analysis of Mills Ratios and
 Tail Thickness*. R package version 0.1.0,
