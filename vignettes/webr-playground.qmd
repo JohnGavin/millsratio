@@ -10,7 +10,7 @@ format:
     toc: true
 engine: knitr
 filters:
-  - webr
+  - ../_extensions/coatless/webr/webr.lua
 webr:
   packages: ['ggplot2', 'dplyr', 'tidyr', 'purrr']
   autoload-packages: true
