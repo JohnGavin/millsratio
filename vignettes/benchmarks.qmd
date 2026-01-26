@@ -13,7 +13,7 @@ format:
 ```{r setup}
 #| message: false
 #| warning: false
-devtools::load_all(quiet = TRUE)
+library(millsratio)
 library(tidyverse)
 
 # Make microbenchmark optional

@@ -13,7 +13,7 @@ format:
 ```{r setup}
 #| message: false
 #| warning: false
-devtools::load_all(quiet = TRUE)
+library(millsratio)
 library(tidyverse)
 library(plotly)
 library(DT)
@@ -226,7 +226,7 @@ The dashboard includes ready-to-copy tidyverse code:
 ### Basic Mills Ratio Calculation
 
 ```r
-devtools::load_all(quiet = TRUE)
+library(millsratio)
 library(tidyverse)
 
 # Calculate and compare Mills ratios
