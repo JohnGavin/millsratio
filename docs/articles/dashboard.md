@@ -1,0 +1,350 @@
+# Interactive Dashboard
+
+``` r
+devtools::load_all(quiet = TRUE)
+library(tidyverse)
+library(plotly)
+library(DT)
+```
+
+## Overview
+
+The millsratio package includes two interactive dashboards for exploring
+Mills ratios and their relationship to distribution tail thickness:
+
+1.  **Simple Dashboard**
+    ([`launch_dashboard_simple()`](https://johngavin.github.io/millsratio/reference/launch_dashboard_simple.md)) -
+    Focused on core concepts
+2.  **Full Dashboard**
+    ([`launch_dashboard()`](https://johngavin.github.io/millsratio/reference/launch_dashboard.md)) -
+    Comprehensive 12-page analysis
+
+## Dashboard Features
+
+### Simple Dashboard
+
+The simplified dashboard focuses on essential functionality:
+
+- **Analysis Page**: Compare Mills ratios across distributions
+- **Theory Page**: Mathematical foundations and asymptotic behavior
+- **Hazard Function Page**: Explore the h(x) = 1/m(x) relationship
+- **R Code Page**: Ready-to-use tidyverse examples
+
+Launch it with:
+
+``` r
+launch_dashboard_simple()
+```
+
+### Full Dashboard (12 Pages)
+
+The comprehensive dashboard is organized into three main sections:
+
+#### Analysis Section
+
+1.  **Dashboard Overview**: Introduction and navigation guide
+2.  **Distribution Comparison**: Side-by-side analysis of multiple
+    distributions
+3.  **The t(30) Paradox**: Deep dive into why t(30) appears normal but
+    isn’t
+4.  **Tail Thickness Analysis**: Quantitative measures of tail behavior
+
+#### Theory Section
+
+5.  **Mathematical Foundation**: Definitions and derivations
+6.  **Asymptotic Behavior**: Long-run properties of Mills ratios
+7.  **Properties Comparison**: Table of distribution characteristics
+8.  **References**: Academic sources and further reading
+
+#### Playground Section
+
+9.  **Interactive Explorer**: Real-time parameter adjustment
+10. **Code Playground**: Write and test custom Mills ratio code
+11. **Simulation Lab**: Monte Carlo verification tools
+12. **Export Results**: Download analyses and visualizations
+
+Launch it with:
+
+``` r
+launch_dashboard()
+```
+
+## Key Interactive Features
+
+### Real-time Visualization
+
+Both dashboards provide instant feedback as you adjust parameters:
+
+``` r
+# Example of what the dashboard visualizes
+x <- seq(0.1, 5, by = 0.1)
+data <- tibble(x = x) %>%
+  mutate(
+    Normal = mills_ratio_normal(x),
+    `t(30)` = mills_ratio_t(x, df = 30),
+    `t(3)` = mills_ratio_t(x, df = 3),
+    Exponential = mills_ratio_exp(x)
+  ) %>%
+  pivot_longer(-x, names_to = "distribution", values_to = "mills_ratio")
+
+p <- ggplot(data, aes(x, mills_ratio, color = distribution)) +
+  geom_line(size = 1.2) +
+  scale_y_log10() +
+  labs(
+    title = "Mills Ratio Comparison",
+    subtitle = "Note the divergence in tail behavior",
+    x = "x",
+    y = "Mills Ratio m(x) (log scale)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+    Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ℹ Please use `linewidth` instead.
+
+``` r
+ggplotly(p)
+```
+
+### Distribution Comparison Table
+
+The dashboards generate comparison tables like this:
+
+``` r
+# Compare Mills ratios at key points
+x_points <- c(1, 2, 3, 4, 5)
+comparison <- tibble(
+  x = x_points,
+  Normal = mills_ratio_normal(x_points),
+  `t(30)` = mills_ratio_t(x_points, df = 30),
+  `t(3)` = mills_ratio_t(x_points, df = 3),
+  Exponential = mills_ratio_exp(x_points)
+) %>%
+  mutate(
+    `t(30)/Normal` = `t(30)` / Normal,
+    `t(3)/Normal` = `t(3)` / Normal
+  )
+
+comparison %>%
+  DT::datatable(
+    caption = "Mills Ratio Values and Ratios",
+    options = list(pageLength = 5, dom = 't')
+  ) %>%
+  formatRound(2:7, digits = 4)
+```
+
+### The t(30) Paradox Visualization
+
+A key feature demonstrates why t(30) is dangerous to treat as normal:
+
+``` r
+# Analyze the paradox
+paradox_data <- tibble(x = seq(0, 5, by = 0.1)) %>%
+  mutate(
+    normal = mills_ratio_normal(x),
+    t30 = mills_ratio_t(x, df = 30),
+    ratio = t30 / normal,
+    percent_diff = (ratio - 1) * 100
+  )
+
+# Plot the divergence
+p_paradox <- ggplot(paradox_data, aes(x, percent_diff)) +
+  geom_line(color = "#e74c3c", size = 1.2) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.5) +
+  labs(
+    title = "The t(30) Paradox: Percentage Difference from Normal",
+    subtitle = "t(30) Mills ratio increasingly exceeds normal in the tails",
+    x = "x",
+    y = "% Difference from Normal"
+  ) +
+  theme_minimal() +
+  annotate(
+    "text", x = 4, y = 40,
+    label = "At x=4: t(30) is 54% higher",
+    color = "#e74c3c", fontface = "bold"
+  )
+
+ggplotly(p_paradox)
+```
+
+## Hazard Function Connection
+
+The dashboard explores the reciprocal relationship between Mills ratio
+and hazard function:
+
+``` r
+# Show both functions together
+hazard_data <- tibble(x = seq(0.5, 5, by = 0.1)) %>%
+  mutate(
+    mills_normal = mills_ratio_normal(x),
+    hazard_normal = 1 / mills_normal,
+    mills_t30 = mills_ratio_t(x, df = 30),
+    hazard_t30 = 1 / mills_t30
+  ) %>%
+  pivot_longer(
+    -x,
+    names_to = c("func_type", "distribution"),
+    names_sep = "_",
+    values_to = "value"
+  )
+
+p_hazard <- hazard_data %>%
+  ggplot(aes(x, value, color = interaction(func_type, distribution))) +
+  geom_line(size = 1) +
+  scale_y_log10() +
+  labs(
+    title = "Mills Ratio m(x) and Hazard Function h(x) = 1/m(x)",
+    x = "x",
+    y = "Value (log scale)"
+  ) +
+  theme_minimal() +
+  scale_color_manual(
+    values = c(
+      "mills.normal" = "#2c3e50",
+      "hazard.normal" = "#e74c3c",
+      "mills.t30" = "#3498db",
+      "hazard.t30" = "#e67e22"
+    ),
+    labels = c(
+      "mills.normal" = "Mills Normal",
+      "hazard.normal" = "Hazard Normal",
+      "mills.t30" = "Mills t(30)",
+      "hazard.t30" = "Hazard t(30)"
+    )
+  ) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+ggplotly(p_hazard)
+```
+
+## Code Examples in Dashboard
+
+The dashboard includes ready-to-copy tidyverse code:
+
+### Basic Mills Ratio Calculation
+
+``` r
+devtools::load_all(quiet = TRUE)
+library(tidyverse)
+
+# Calculate and compare Mills ratios
+df <- tibble(x = seq(0.5, 5, by = 0.5)) %>%
+  mutate(
+    normal = mills_ratio_normal(x),
+    t30 = mills_ratio_t(x, df = 30),
+    exponential = mills_ratio_exp(x),
+    t30_normal_ratio = t30 / normal
+  )
+```
+
+### Hazard Function Analysis
+
+``` r
+# Hazard function from Mills ratio
+df_hazard <- df %>%
+  mutate(
+    hazard_normal = 1 / normal,
+    hazard_t30 = 1 / t30,
+    hazard_exp = 1 / exponential
+  )
+
+# Check if hazard is increasing (IFR property)
+df_hazard %>%
+  arrange(x) %>%
+  mutate(
+    normal_increasing = hazard_normal > lag(hazard_normal),
+    t30_increasing = hazard_t30 > lag(hazard_t30),
+    exp_constant = abs(hazard_exp - lag(hazard_exp)) < 1e-10
+  )
+```
+
+### Visualization Pipeline
+
+``` r
+# Create comparison plot
+df %>%
+  select(x, normal, t30, exponential) %>%
+  pivot_longer(-x, names_to = "distribution", values_to = "mills_ratio") %>%
+  ggplot(aes(x, mills_ratio, color = distribution)) +
+  geom_line(linewidth = 1) +
+  scale_y_log10() +
+  labs(
+    title = "Mills Ratio Comparison",
+    y = "Mills Ratio m(x) (log scale)"
+  ) +
+  theme_minimal()
+```
+
+## Dashboard Architecture
+
+The dashboard is built with:
+
+- **UI**: `bslib` for Bootstrap 5 theming
+- **Server**: Reactive Shiny server with efficient caching
+- **Plots**: `plotly` for interactive visualizations
+- **Tables**: `DT` for sortable, searchable tables
+- **Math**: MathJax for rendering mathematical notation
+
+### File Structure
+
+    inst/shiny/
+    ├── ui_simple.R         # Simplified UI (4 pages)
+    ├── server_simple.R     # Simplified server logic
+    ├── ui.R               # Full UI (12 pages)
+    ├── server.R           # Full server logic
+    └── www/              # Static assets
+        └── custom.css    # Custom styling
+
+## Extending the Dashboard
+
+To add new features to the dashboard:
+
+1.  **Add new distributions**: Implement in `R/mills_ratio.R`
+2.  **Add visualization**: Update `server.R` reactive functions
+3.  **Add theory content**: Edit `ui.R` nav_panel sections
+4.  **Add examples**: Update the Code Playground section
+
+## Performance Considerations
+
+The dashboards are optimized for performance:
+
+- Reactive caching prevents redundant calculations
+- Efficient vectorized operations throughout
+- Lazy evaluation for expensive computations
+- Debounced inputs to reduce update frequency
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1.  **Dashboard won’t launch**: Ensure all dependencies are installed
+
+    ``` r
+    remotes::install_github("JohnGavin/millsratio")
+    ```
+
+2.  **Plots not rendering**: Check that plotly is installed
+
+    ``` r
+    install.packages("plotly")
+    ```
+
+3.  **Math notation not displaying**: MathJax requires internet
+    connection
+
+4.  **Slow performance**: Reduce the number of points in x-range
+
+## Next Steps
+
+After exploring the dashboard:
+
+1.  Read the [Mathematical
+    Theory](https://johngavin.github.io/millsratio/articles/theory.qmd)
+    article
+2.  Review [Practical
+    Applications](https://johngavin.github.io/millsratio/articles/applications.qmd)
+3.  Explore the [Hazard Function
+    Connection](https://johngavin.github.io/millsratio/articles/hazard-connection.qmd)
+4.  Run the [Performance
+    Benchmarks](https://johngavin.github.io/millsratio/articles/benchmarks.qmd)
