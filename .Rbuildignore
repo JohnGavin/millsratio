@@ -22,3 +22,5 @@
 ^pr_number\.txt$
 ^references\.bib$
 ^vignettes/.*\.qmd$
+^_extensions$
+^_freeze$
