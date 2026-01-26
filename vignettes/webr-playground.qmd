@@ -5,7 +5,7 @@ author: "John Gavin"
 date: today
 format:
   html:
-    code-fold: false
+    code-fold: true
     code-tools: true
     toc: true
 engine: knitr
@@ -16,12 +16,18 @@ webr:
   autoload-packages: true
 ---
 
-```{r}
-#| context: setup
-#| echo: false
+## Welcome to the WebR Playground! 🎮
 
-# Pre-load the millsratio functions for WebR
-# Since millsratio isn't on CRAN, we define the key functions here
+This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
+
+### Initialize Functions (Run First!)
+
+**Important:** Click "Run Code" below to load the Mills ratio functions before trying the examples:
+
+```{webr-r}
+#| autorun: true
+# Load Mills ratio functions for this session
+# Since millsratio is not on CRAN, we define the functions here
 
 mills_ratio_normal <- function(x, mean = 0, sd = 1) {
   z <- (x - mean) / sd
@@ -88,7 +94,6 @@ analyze_t30_paradox <- function() {
   )
 }
 
-# Pre-load message
 cat("Mills ratio functions loaded successfully!\n")
 cat("Available functions:\n")
 cat("- mills_ratio_normal(x)\n")
@@ -99,12 +104,6 @@ cat("- hazard_function(x, distribution, ...)\n")
 cat("- compare_mills_hazard(x, distribution, ...)\n")
 cat("- analyze_t30_paradox()\n")
 ```
-
-## Welcome to the WebR Playground! 🎮
-
-This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
-
-**Note:** Since millsratio is not available on CRAN, the core functions have been manually defined in this page's setup. This includes `mills_ratio_normal()`, `mills_ratio_t()`, `mills_ratio_exp()`, and related functions.
 
 ## Quick Start Examples
 
