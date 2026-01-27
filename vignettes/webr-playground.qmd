@@ -12,97 +12,38 @@ engine: knitr
 filters:
   - ../_extensions/coatless/webr/webr.lua
 webr:
-  packages: ['ggplot2', 'dplyr', 'tidyr', 'purrr']
+  packages: ['ggplot2', 'dplyr', 'tidyr', 'purrr', 'millsratio']
   autoload-packages: true
+  repos:
+    - https://johngavin.github.io/millsratio/webr-packages
+    - https://repo.r-wasm.org
 ---
 
 ## Welcome to the WebR Playground! 🎮
 
 This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
 
-### Initialize Functions (Run First!)
+### Package Loading
 
-**Important:** Click "Run Code" below to load the Mills ratio functions before trying the examples:
+The millsratio package is automatically loaded from our WebR repository. All functions are ready to use:
 
 ```{webr-r}
 #| autorun: true
-# Load Mills ratio functions for this session
-# Since millsratio is not on CRAN, we define the functions here
-
-mills_ratio_normal <- function(x, mean = 0, sd = 1) {
-  z <- (x - mean) / sd
-  survival <- pnorm(z, lower.tail = FALSE)
-  density <- dnorm(z)
-  survival / density
+# Verify millsratio package is loaded
+if (!requireNamespace("millsratio", quietly = TRUE)) {
+  # Fallback: Install from WebR repository if not auto-loaded
+  install.packages("millsratio",
+                   repos = c("https://johngavin.github.io/millsratio/webr-packages",
+                             "https://repo.r-wasm.org"))
 }
+library(millsratio)
 
-mills_ratio_t <- function(x, df, ncp = 0) {
-  survival <- pt(x, df, ncp, lower.tail = FALSE)
-  density <- dt(x, df, ncp)
-  survival / density
-}
-
-mills_ratio_exp <- function(x, rate = 1) {
-  rep(1/rate, length(x))
-}
-
-hazard_from_mills <- function(mills_ratio) {
-  1 / mills_ratio
-}
-
-hazard_function <- function(x, distribution = "normal", ...) {
-  f <- switch(distribution,
-    normal = dnorm(x, ...),
-    t = dt(x, ...),
-    exponential = dexp(x, ...),
-    stop("Unknown distribution: ", distribution)
-  )
-
-  survival <- switch(distribution,
-    normal = pnorm(x, ..., lower.tail = FALSE),
-    t = pt(x, ..., lower.tail = FALSE),
-    exponential = pexp(x, ..., lower.tail = FALSE)
-  )
-
-  f / survival
-}
-
-compare_mills_hazard <- function(x, distribution = "normal", ...) {
-  mills <- switch(distribution,
-    normal = mills_ratio_normal(x, ...),
-    t = mills_ratio_t(x, ...),
-    exponential = mills_ratio_exp(x, ...),
-    stop("Unknown distribution: ", distribution)
-  )
-
-  data.frame(
-    x = x,
-    mills_ratio = mills,
-    hazard = 1 / mills,
-    distribution = distribution
-  )
-}
-
-# Helper function for the t(30) paradox
-analyze_t30_paradox <- function() {
-  x <- seq(0.5, 5, by = 0.5)
-  data.frame(
-    x = x,
-    normal = mills_ratio_normal(x),
-    t30 = mills_ratio_t(x, df = 30),
-    ratio = mills_ratio_t(x, df = 30) / mills_ratio_normal(x)
-  )
-}
-
-cat("Mills ratio functions loaded successfully!\n")
+# Display available functions
+cat("millsratio package loaded successfully!\n")
 cat("Available functions:\n")
-cat("- mills_ratio_normal(x)\n")
-cat("- mills_ratio_t(x, df)\n")
-cat("- mills_ratio_exp(x)\n")
-cat("- hazard_from_mills(mills_ratio)\n")
-cat("- hazard_function(x, distribution, ...)\n")
-cat("- compare_mills_hazard(x, distribution, ...)\n")
-cat("- analyze_t30_paradox()\n")
+ls("package:millsratio") |>
+  paste(collapse = "\n- ") |>
+  (\(x) cat("- ", x, "\n"))()
 ```
 
 ## Quick Start Examples

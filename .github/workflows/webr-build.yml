@@ -1,0 +1,18 @@
+name: Build and Deploy WebR Package
+
+on:
+  push:
+    branches: [main, webr-compilation-issue-11]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-webr-package:
+    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
+    with:
+      packages: "."
+    permissions:
+      repository-projects: read
+      pages: write
+      id-token: write
