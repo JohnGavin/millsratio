@@ -5,7 +5,7 @@ author: "John Gavin"
 date: today
 format:
   html:
-    code-fold: true
+    code-fold: false
     code-tools: true
     toc: true
 ---

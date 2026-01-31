@@ -5,7 +5,7 @@ author: "John Gavin"
 date: today
 format:
   html:
-    code-fold: true
+    code-fold: false
     code-tools: true
     toc: true
 ---
@@ -25,18 +25,6 @@ The millsratio package includes two interactive dashboards for exploring Mills r
 
 1. **Simple Dashboard** (`launch_dashboard_simple()`) - Focused on core concepts
 2. **Full Dashboard** (`launch_dashboard()`) - Comprehensive 12-page analysis
-
-:::callout-note
-## Running the Dashboard
-The dashboards are **interactive Shiny applications** that run locally on your computer. They are not available on the website. To use them:
-
-1. Install the millsratio package
-2. Run `library(millsratio)` in R
-3. Execute `launch_dashboard()` or `launch_dashboard_simple()`
-4. Your browser will open with the interactive dashboard
-
-The dashboards require a local R installation and cannot be embedded in static documentation.
-:::
 
 ## Dashboard Features
 

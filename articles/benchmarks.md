@@ -1,7 +1,5 @@
 # Performance Benchmarks
 
-Code
-
 ``` r
 library(millsratio)
 library(tidyverse)
@@ -25,8 +23,6 @@ Comparison with alternative implementations
 
 ### Single Value Calculations
 
-Code
-
 ``` r
 if (has_microbenchmark) {
   # Benchmark single value calculations
@@ -47,8 +43,6 @@ if (has_microbenchmark) {
 ```
 
 ### Vectorized Operations
-
-Code
 
 ``` r
 # Benchmark vector operations
@@ -72,8 +66,6 @@ autoplot(bench_vector) +
 ```
 
 ### Scaling Analysis
-
-Code
 
 ``` r
 # How does performance scale with input size?
@@ -116,8 +108,6 @@ ggplot(scaling_data, aes(size, time_ms)) +
 
 ### Comparison with High-Precision Computation
 
-Code
-
 ``` r
 # Test accuracy against high-precision alternatives
 test_points <- c(0.1, 0.5, 1, 2, 3, 5, 10, 20)
@@ -151,8 +141,6 @@ print(accuracy_df %>%
 
 ### Extreme Value Accuracy
 
-Code
-
 ``` r
 # Test at extreme values where numerical issues arise
 extreme_x <- c(30, 35, 37, 38, 39)
@@ -185,8 +173,6 @@ cat("Package approach NaN/Inf:", sum(!is.finite(extreme_df$package)), "\n")
 
 ## Memory Efficiency
 
-Code
-
 ``` r
 # Memory usage comparison
 library(pryr)
@@ -215,8 +201,6 @@ cat("Ratio:", mem_results$loop / mem_results$vectorized, "x more for loop\n")
 ```
 
 ## Comparison with Other Packages
-
-Code
 
 ``` r
 # Compare with other implementations (if available)
@@ -257,8 +241,6 @@ print(bench_impl)
 
 ### Vectorization Benefits
 
-Code
-
 ``` r
 # Compare vectorized vs loop performance
 vector_approach <- function(x) {
@@ -297,8 +279,6 @@ cat("Apply vs Vectorized:", times[3] / times[1], "x\n")
 
 ### Caching for Repeated Calculations
 
-Code
-
 ``` r
 # Implement simple caching for repeated values
 create_cached_mills <- function() {
@@ -331,8 +311,6 @@ print(cache_bench)
 
 ## Platform Comparison
 
-Code
-
 ``` r
 # System information
 cat("Benchmark Platform:\n")
@@ -359,8 +337,6 @@ Based on benchmarking results:
     computation
 
 ## Summary Statistics
-
-Code
 
 ``` r
 # Overall performance summary
