@@ -1,0 +1,172 @@
+name: Build and Deploy WebR Packages to gh-pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up R
+        uses: r-lib/setup-r@v2
+        with:
+          r-version: release
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev
+
+      - name: Install R dependencies
+        run: |
+          options(repos = c(CRAN = 'https://cran.rstudio.com'))
+          install.packages(c('devtools', 'remotes'))
+          remotes::install_deps('.', dependencies = TRUE)
+        shell: Rscript {0}
+        working-directory: /home/runner/work/millsratio/millsratio
+
+      - name: Build WebR package binary
+        run: |
+          # Install webr package
+          install.packages('webr', repos = 'https://repo.r-wasm.org')
+
+          # Create build directory
+          dir.create('_webr_build', showWarnings = FALSE)
+
+          # Build package for WebR
+          webr::pak('.')
+        shell: Rscript {0}
+        working-directory: /home/runner/work/millsratio/millsratio
+
+      - name: Check build output
+        run: |
+          ls -la _webr_build/
+          find _webr_build -type f | head -20
+
+      - name: Configure git for push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Create or update gh-pages branch
+        run: |
+          # Check if gh-pages branch exists
+          if git rev-parse --verify origin/gh-pages > /dev/null 2>&1; then
+            echo "gh-pages branch exists, checking out..."
+            git checkout gh-pages
+          else
+            echo "Creating new gh-pages branch..."
+            git checkout --orphan gh-pages
+            git reset --hard
+          fi
+
+      - name: Copy WebR build artifacts to gh-pages
+        run: |
+          # Ensure we're on gh-pages
+          git checkout gh-pages
+
+          # Create webr directory if it doesn't exist
+          mkdir -p webr
+
+          # Copy built packages
+          cp -r /home/runner/work/millsratio/millsratio/_webr_build/* webr/ || true
+
+          # Create index HTML if it doesn't exist
+          if [ ! -f webr/index.html ]; then
+            cat > webr/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebR Packages Repository</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .info { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>WebR Packages</h1>
+    <p class="info">This repository contains pre-built WebR packages.</p>
+    <p>Repository URL: <code>https://johngavin.github.io/millsratio/webr</code></p>
+    <p>Use in your Quarto documents with:</p>
+    <pre>webr:
+  repositories:
+    - https://johngavin.github.io/millsratio/webr</pre>
+</body>
+</html>
+EOF
+          fi
+
+          # List what we're deploying
+          echo "Files to be committed:"
+          find webr -type f | sort
+
+      - name: Commit and push to gh-pages
+        run: |
+          git checkout gh-pages
+          git add webr/
+
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy WebR packages from main branch ($(date -u +'%Y-%m-%d %H:%M:%S UTC'))"
+            git push origin gh-pages
+            echo "Successfully pushed WebR packages to gh-pages"
+          fi
+
+      - name: Return to main branch
+        if: always()
+        run: |
+          git checkout main
+
+  verify-deployment:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Verify deployment
+        run: |
+          if [ -d webr ]; then
+            echo "WebR directory exists"
+            ls -lah webr/
+
+            # Check for package index
+            if [ -f webr/_packages.json ] || [ -f webr/index.html ]; then
+              echo "Deployment verification: SUCCESS"
+            else
+              echo "Warning: No package index found, but webr directory exists"
+            fi
+          else
+            echo "Warning: webr directory not found on gh-pages"
+            exit 1
+          fi
+
+      - name: Log deployment URL
+        run: |
+          echo "WebR repository deployed to:"
+          echo "https://johngavin.github.io/millsratio/webr"
