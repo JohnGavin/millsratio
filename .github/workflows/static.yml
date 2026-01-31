@@ -35,21 +35,26 @@ jobs:
       - name: Install WebR tools
         run: |
           options(repos = c(CRAN = "https://cloud.r-project.org"))
-          install.packages('pak')
-          pak::pkg_install('r-wasm/rwasm')
+          install.packages('remotes')
+          remotes::install_github('r-wasm/rwasm')
         shell: Rscript {0}
 
       - name: Build WebR package
         run: |
           library(rwasm)
           # Build the package for WebAssembly
-          build(".", webr = TRUE)
+          rwasm::build(".", dest_dir = "_webr_packages")
           # Create deployment directory
           dir.create("_site/webr-packages", recursive = TRUE)
           # Copy built packages
-          if (dir.exists("_webr_build")) {
-            file.copy("_webr_build", "_site/webr-packages", recursive = TRUE)
+          if (dir.exists("_webr_packages")) {
+            files <- list.files("_webr_packages", full.names = TRUE, recursive = TRUE)
+            for (f in files) {
+              file.copy(f, "_site/webr-packages/", recursive = FALSE)
+            }
           }
+          # Create PACKAGES index
+          tools::write_PACKAGES("_site/webr-packages", type = "source")
         shell: Rscript {0}
 
       - name: Setup Pages
