@@ -34,6 +34,7 @@ jobs:
 
       - name: Install WebR tools
         run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
           install.packages('pak')
           pak::pkg_install('r-wasm/rwasm')
         shell: Rscript {0}
