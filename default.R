@@ -37,16 +37,28 @@ r_packages <- setdiff(all_packages, base_packages)
 dev_tools <- c("devtools", "pkgload")
 r_packages <- unique(c(r_packages, dev_tools))
 
-cat("Generating default.nix with the following R packages:\n")
+# Add rwasm as GitHub package
+gh_pkgs <- list(
+  list(
+    package_name = "rwasm",
+    repo_url = "https://github.com/r-wasm/rwasm",
+    commit = "ebd68f7a1eb3378dfc968dd7ddcd3f412c34e8bb"  # Latest as of 2026-01-31
+  )
+)
+
+cat("Generating default.nix with the following packages:\n")
 cat("From DESCRIPTION:\n")
 cat(paste(" -", setdiff(r_packages, dev_tools)), sep = "\n")
 cat("Developer tools:\n")
 cat(paste(" -", dev_tools), sep = "\n")
+cat("GitHub packages:\n")
+cat(" - rwasm (r-wasm/rwasm)\n")
 
 # Generate default.nix
 rix(
   r_ver = "4.5.2",
   r_pkgs = r_packages,
+  git_pkgs = gh_pkgs,
   system_pkgs = NULL,  # No extra system packages needed
   ide = "rstudio",
   project_path = ".",
