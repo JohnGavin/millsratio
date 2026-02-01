@@ -404,7 +404,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"library(millsratio)\n\n# Display available functions\ncat(\"Available functions:\\n\")\nls(\"package:millsratio\") |>\n  paste(collapse = \"\\n- \") |>\n  (\\(x) cat(\"- \", x, \"\\n\"))()","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Calculate Mills ratio for normal distribution\nx <- seq(1, 5, by = 0.5)\nm_normal <- mills_ratio_normal(x)\nprint(round(m_normal, 3))\n\n# Calculate for t-distribution with 30 df\nm_t30 <- mills_ratio_t(x, df = 30)\nprint(round(m_t30, 3))\n\n# Compare the ratios\nratio <- m_t30 / m_normal\ncat(\"\\nt(30)/Normal ratio:\\n\")\nprint(round(ratio, 3))","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Analyze the t(30) paradox\nparadox_data <- analyze_t30_paradox()\n\n# Show the divergence\ncat(\"t(30) vs Normal Mills Ratio Divergence:\\n\")\ncat(\"=====================================\\n\")\nfor(i in 1:nrow(paradox_data)) {\n  cat(sprintf(\"x = %.1f: Normal = %.3f, t(30) = %.3f, Ratio = %.3f\\n\",\n              paradox_data$x[i],\n              paradox_data$normal[i],\n              paradox_data$t30[i],\n              paradox_data$ratio[i]))\n}\n\n# Key insight\ncat(\"\\nKey insight: At x=4, t(30) Mills ratio is 54% higher than normal!\\n\")","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"library(dplyr)\nlibrary(tidyr)\n\n# Create comparison data frame\ncomparison <- tibble(x = seq(0.5, 3, by = 0.5)) %>%\n  mutate(\n    Normal = mills_ratio_normal(x),\n    `t(30)` = mills_ratio_t(x, df = 30),\n    `t(3)` = mills_ratio_t(x, df = 3),\n    Exponential = mills_ratio_exp(x)\n  )\n\n# Display the comparison\nprint(comparison)\n\n# Compute summary statistics\ncomparison %>%\n  pivot_longer(-x, names_to = \"distribution\", values_to = \"mills_ratio\") %>%\n  group_by(distribution) %>%\n  summarise(\n    mean = mean(mills_ratio),\n    sd = sd(mills_ratio),\n    min = min(mills_ratio),\n    max = max(mills_ratio)\n  ) %>%\n  print()","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Calculate hazard from Mills ratio\nx <- c(1, 2, 3, 4, 5)\nmills <- mills_ratio_normal(x)\nhazard <- hazard_from_mills(mills)\n\n# Create comparison table\nresults <- data.frame(\n  x = x,\n  mills_ratio = round(mills, 4),\n  hazard = round(hazard, 4),\n  product = round(mills * hazard, 4)\n)\n\nprint(results)\ncat(\"\\nNote: Mills ratio × Hazard = 1 (they are reciprocals)\\n\")\n\n# Compare hazard functions across distributions\nx_seq <- seq(0.5, 5, by = 0.5)\nhazard_comparison <- data.frame(\n  x = x_seq,\n  normal = hazard_function(x_seq, \"normal\"),\n  t30 = hazard_function(x_seq, \"t\", df = 30),\n  exponential = hazard_function(x_seq, \"exponential\")\n)\n\ncat(\"\\nHazard Function Comparison:\\n\")\nprint(head(hazard_comparison, 10))","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"library(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\n\n# Generate data for plotting\nplot_data <- tibble(x = seq(0.1, 5, length.out = 100)) %>%\n  mutate(\n    Normal = mills_ratio_normal(x),\n    `t(30)` = mills_ratio_t(x, df = 30),\n    `t(3)` = mills_ratio_t(x, df = 3),\n    Exponential = mills_ratio_exp(x)\n  ) %>%\n  pivot_longer(-x, names_to = \"Distribution\", values_to = \"Mills_Ratio\")\n\n# Create the plot\np <- ggplot(plot_data, aes(x, Mills_Ratio, color = Distribution)) +\n  geom_line(linewidth = 1) +\n  scale_y_log10() +\n  labs(\n    title = \"Mills Ratio Comparison Across Distributions\",\n    subtitle = \"Log scale reveals tail behavior differences\",\n    x = \"x\",\n    y = \"Mills Ratio m(x) (log scale)\"\n  ) +\n  theme_minimal() +\n  theme(\n    legend.position = \"bottom\",\n    plot.title = element_text(face = \"bold\", size = 14),\n    plot.subtitle = element_text(size = 12)\n  ) +\n  scale_color_manual(values = c(\n    \"Normal\" = \"#2E86AB\",\n    \"t(30)\" = \"#A23B72\",\n    \"t(3)\" = \"#F18F01\",\n    \"Exponential\" = \"#C73E1D\"\n  ))\n\nprint(p)","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Test 1: Normal has decreasing Mills ratio (thin tails)\nx_test <- seq(1, 5, by = 0.5)\nm_normal <- mills_ratio_normal(x_test)\nnormal_decreasing <- all(diff(m_normal) < 0)\ncat(\"Normal Mills ratio is decreasing:\", normal_decreasing, \"\\n\")\n\n# Test 2: t(3) has increasing Mills ratio (fat tails)\nm_t3 <- mills_ratio_t(x_test, df = 3)\nt3_increasing <- all(diff(m_t3) > 0)\ncat(\"t(3) Mills ratio is increasing:\", t3_increasing, \"\\n\")\n\n# Test 3: Exponential has constant Mills ratio\nm_exp <- mills_ratio_exp(x_test)\nexp_constant <- all(abs(diff(m_exp)) < 1e-10)\ncat(\"Exponential Mills ratio is constant:\", exp_constant, \"\\n\")\n\n# Test 4: Hazard function properties\nh_normal <- hazard_function(x_test, \"normal\")\nnormal_hazard_increasing <- all(diff(h_normal) > 0)\ncat(\"\\nNormal hazard is increasing (IFR):\", normal_hazard_increasing, \"\\n\")\n\n# Display the values\ncat(\"\\nMills Ratio Values:\\n\")\nresults <- data.frame(\n  x = x_test,\n  Normal = round(m_normal, 3),\n  `t(3)` = round(m_t3, 3),\n  Exponential = round(m_exp, 3)\n)\nprint(results)","id":7,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Your code here!\n# Try:\n# 1. Different x values\n# 2. Different degrees of freedom for t-distribution\n# 3. Create your own visualizations\n# 4. Explore hazard functions","id":8,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Monte Carlo verification of Mills ratio\nset.seed(123)\nn_sim <- 10000\nx_val <- 2\n\n# Simulate from standard normal\nsamples <- rnorm(n_sim)\n\n# Empirical Mills ratio\nsurvivors <- samples[samples > x_val]\nempirical_mills <- length(survivors) / n_sim / dnorm(x_val)\n\n# Theoretical Mills ratio\ntheoretical_mills <- mills_ratio_normal(x_val)\n\n# Compare\ncat(\"Monte Carlo Verification (n =\", n_sim, \"simulations)\\n\")\ncat(\"========================================\\n\")\ncat(\"x value:\", x_val, \"\\n\")\ncat(\"Empirical Mills ratio:\", round(empirical_mills, 4), \"\\n\")\ncat(\"Theoretical Mills ratio:\", round(theoretical_mills, 4), \"\\n\")\ncat(\"Relative error:\", round(abs(empirical_mills - theoretical_mills) / theoretical_mills * 100, 2), \"%\\n\")\n\n# Try with t-distribution\nt_samples <- rt(n_sim, df = 30)\nt_survivors <- t_samples[t_samples > x_val]\nempirical_t_mills <- length(t_survivors) / n_sim / dt(x_val, df = 30)\ntheoretical_t_mills <- mills_ratio_t(x_val, df = 30)\n\ncat(\"\\nt(30) Distribution:\\n\")\ncat(\"Empirical Mills ratio:\", round(empirical_t_mills, 4), \"\\n\")\ncat(\"Theoretical Mills ratio:\", round(theoretical_t_mills, 4), \"\\n\")\ncat(\"Relative error:\", round(abs(empirical_t_mills - theoretical_t_mills) / theoretical_t_mills * 100, 2), \"%\\n\")","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Customize this example with your own parameters\nx_range <- seq(0.5, 4, by = 0.5)\n\n# Choose your distributions\ndist1 <- mills_ratio_normal(x_range)\ndist2 <- mills_ratio_t(x_range, df = 10)  # Change df as needed\n\n# Create comparison\ncomparison <- data.frame(\n  x = x_range,\n  Distribution1 = dist1,\n  Distribution2 = dist2,\n  Ratio = dist2 / dist1,\n  Percent_Diff = (dist2 / dist1 - 1) * 100\n)\n\nprint(comparison)\n\n# Find crossover point (if any)\nif(any(diff(sign(dist1 - dist2)) != 0)) {\n  cat(\"\\nDistributions cross over in the given range!\\n\")\n} else {\n  cat(\"\\nNo crossover in the given range.\\n\")\n}","id":10,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Explore how degrees of freedom affect t-distribution Mills ratio\nx <- 3  # Fixed point\ndf_values <- c(1, 2, 3, 5, 10, 20, 30, 50, 100, 1000)\n\nresults <- data.frame(\n  df = df_values,\n  mills_ratio = sapply(df_values, function(d) mills_ratio_t(x, df = d)),\n  normal_limit = mills_ratio_normal(x)\n)\n\ncat(\"t-distribution Mills ratio at x =\", x, \"for different df:\\n\")\ncat(\"=====================================================\\n\")\nprint(results)\n\ncat(\"\\nObservation: As df increases, t-distribution approaches normal.\\n\")","id":11,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}}];
+globalThis.qwebrCellDetails = [{"code":"library(millsratio)\n\n# Display available functions\ncat(\"Available functions:\\n\")\nls(\"package:millsratio\") |>\n  paste(collapse = \"\\n- \") |>\n  (\\(x) cat(\"- \", x, \"\\n\"))()","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Calculate Mills ratio for normal distribution\nx <- seq(1, 5, by = 0.5)\nm_normal <- mills_ratio_normal(x)\nprint(round(m_normal, 3))\n\n# Calculate for t-distribution with 30 df\nm_t30 <- mills_ratio_t(x, df = 30)\nprint(round(m_t30, 3))\n\n# Compare the ratios\nratio <- m_t30 / m_normal\ncat(\"\\nt(30)/Normal ratio:\\n\")\nprint(round(ratio, 3))","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Analyze the t(30) paradox\nparadox_data <- analyze_t30_paradox()\n\n# Show the divergence\ncat(\"t(30) vs Normal Mills Ratio Divergence:\\n\")\ncat(\"=====================================\\n\")\nfor(i in 1:nrow(paradox_data)) {\n  cat(sprintf(\"x = %.1f: Normal = %.3f, t(30) = %.3f, Ratio = %.3f\\n\",\n              paradox_data$x[i],\n              paradox_data$normal[i],\n              paradox_data$t30[i],\n              paradox_data$ratio[i]))\n}\n\n# Key insight\ncat(\"\\nKey insight: At x=4, t(30) Mills ratio is 54% higher than normal!\\n\")","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"library(dplyr)\nlibrary(tidyr)\n\n# Create comparison data frame\ncomparison <- tibble(x = seq(0.5, 3, by = 0.5)) %>%\n  mutate(\n    Normal = mills_ratio_normal(x),\n    `t(30)` = mills_ratio_t(x, df = 30),\n    `t(3)` = mills_ratio_t(x, df = 3),\n    Exponential = mills_ratio_exp(x)\n  )\n\n# Display the comparison\nprint(comparison)\n\n# Compute summary statistics\ncomparison %>%\n  pivot_longer(-x, names_to = \"distribution\", values_to = \"mills_ratio\") %>%\n  group_by(distribution) %>%\n  summarise(\n    mean = mean(mills_ratio),\n    sd = sd(mills_ratio),\n    min = min(mills_ratio),\n    max = max(mills_ratio)\n  ) %>%\n  print()","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Calculate hazard from Mills ratio\nx <- c(1, 2, 3, 4, 5)\nmills <- mills_ratio_normal(x)\nhazard <- hazard_from_mills(mills)\n\n# Create comparison table\nresults <- data.frame(\n  x = x,\n  mills_ratio = round(mills, 4),\n  hazard = round(hazard, 4),\n  product = round(mills * hazard, 4)\n)\n\nprint(results)\ncat(\"\\nNote: Mills ratio × Hazard = 1 (they are reciprocals)\\n\")\n\n# Compare hazard functions across distributions\nx_seq <- seq(0.5, 5, by = 0.5)\nhazard_comparison <- data.frame(\n  x = x_seq,\n  normal = hazard_function(x_seq, \"normal\"),\n  t30 = hazard_function(x_seq, \"t\", df = 30),\n  exponential = hazard_function(x_seq, \"exponential\")\n)\n\ncat(\"\\nHazard Function Comparison:\\n\")\nprint(head(hazard_comparison, 10))","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Test 1: Normal has decreasing Mills ratio (thin tails)\nx_test <- seq(1, 5, by = 0.5)\nm_normal <- mills_ratio_normal(x_test)\nnormal_decreasing <- all(diff(m_normal) < 0)\ncat(\"Normal Mills ratio is decreasing:\", normal_decreasing, \"\\n\")\n\n# Test 2: t(3) has increasing Mills ratio (fat tails)\nm_t3 <- mills_ratio_t(x_test, df = 3)\nt3_increasing <- all(diff(m_t3) > 0)\ncat(\"t(3) Mills ratio is increasing:\", t3_increasing, \"\\n\")\n\n# Test 3: Exponential has constant Mills ratio\nm_exp <- mills_ratio_exp(x_test)\nexp_constant <- all(abs(diff(m_exp)) < 1e-10)\ncat(\"Exponential Mills ratio is constant:\", exp_constant, \"\\n\")\n\n# Test 4: Hazard function properties\nh_normal <- hazard_function(x_test, \"normal\")\nnormal_hazard_increasing <- all(diff(h_normal) > 0)\ncat(\"\\nNormal hazard is increasing (IFR):\", normal_hazard_increasing, \"\\n\")\n\n# Display the values\ncat(\"\\nMills Ratio Values:\\n\")\nresults <- data.frame(\n  x = x_test,\n  Normal = round(m_normal, 3),\n  `t(3)` = round(m_t3, 3),\n  Exponential = round(m_exp, 3)\n)\nprint(results)","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Your code here!\n# Try:\n# 1. Different x values\n# 2. Different degrees of freedom for t-distribution\n# 3. Create your own visualizations\n# 4. Explore hazard functions","id":7,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Monte Carlo verification of Mills ratio\nset.seed(123)\nn_sim <- 10000\nx_val <- 2\n\n# Simulate from standard normal\nsamples <- rnorm(n_sim)\n\n# Empirical Mills ratio\nsurvivors <- samples[samples > x_val]\nempirical_mills <- length(survivors) / n_sim / dnorm(x_val)\n\n# Theoretical Mills ratio\ntheoretical_mills <- mills_ratio_normal(x_val)\n\n# Compare\ncat(\"Monte Carlo Verification (n =\", n_sim, \"simulations)\\n\")\ncat(\"========================================\\n\")\ncat(\"x value:\", x_val, \"\\n\")\ncat(\"Empirical Mills ratio:\", round(empirical_mills, 4), \"\\n\")\ncat(\"Theoretical Mills ratio:\", round(theoretical_mills, 4), \"\\n\")\ncat(\"Relative error:\", round(abs(empirical_mills - theoretical_mills) / theoretical_mills * 100, 2), \"%\\n\")\n\n# Try with t-distribution\nt_samples <- rt(n_sim, df = 30)\nt_survivors <- t_samples[t_samples > x_val]\nempirical_t_mills <- length(t_survivors) / n_sim / dt(x_val, df = 30)\ntheoretical_t_mills <- mills_ratio_t(x_val, df = 30)\n\ncat(\"\\nt(30) Distribution:\\n\")\ncat(\"Empirical Mills ratio:\", round(empirical_t_mills, 4), \"\\n\")\ncat(\"Theoretical Mills ratio:\", round(theoretical_t_mills, 4), \"\\n\")\ncat(\"Relative error:\", round(abs(empirical_t_mills - theoretical_t_mills) / theoretical_t_mills * 100, 2), \"%\\n\")","id":8,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Customize this example with your own parameters\nx_range <- seq(0.5, 4, by = 0.5)\n\n# Choose your distributions\ndist1 <- mills_ratio_normal(x_range)\ndist2 <- mills_ratio_t(x_range, df = 10)  # Change df as needed\n\n# Create comparison\ncomparison <- data.frame(\n  x = x_range,\n  Distribution1 = dist1,\n  Distribution2 = dist2,\n  Ratio = dist2 / dist1,\n  Percent_Diff = (dist2 / dist1 - 1) * 100\n)\n\nprint(comparison)\n\n# Find crossover point (if any)\nif(any(diff(sign(dist1 - dist2)) != 0)) {\n  cat(\"\\nDistributions cross over in the given range!\\n\")\n} else {\n  cat(\"\\nNo crossover in the given range.\\n\")\n}","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"# Explore how degrees of freedom affect t-distribution Mills ratio\nx <- 3  # Fixed point\ndf_values <- c(1, 2, 3, 5, 10, 20, 30, 50, 100, 1000)\n\nresults <- data.frame(\n  df = df_values,\n  mills_ratio = sapply(df_values, function(d) mills_ratio_t(x, df = d)),\n  normal_limit = mills_ratio_normal(x)\n)\n\ncat(\"t-distribution Mills ratio at x =\", x, \"for different df:\\n\")\ncat(\"=====================================================\\n\")\nprint(results)\n\ncat(\"\\nObservation: As df increases, t-distribution approaches normal.\\n\")","id":10,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"1","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"700px","output":"true","read-only":"false","results":"markup","warning":"true"}}];
 
 </script>
 <script type="module">
@@ -1735,7 +1735,6 @@ globalThis.qwebrExecuteCode = async function (
   <li><a href="#example-2-the-t30-paradox" id="toc-example-2-the-t30-paradox" class="nav-link" data-scroll-target="#example-2-the-t30-paradox">Example 2: The t(30) Paradox</a></li>
   <li><a href="#example-3-tidyverse-analysis" id="toc-example-3-tidyverse-analysis" class="nav-link" data-scroll-target="#example-3-tidyverse-analysis">Example 3: Tidyverse Analysis</a></li>
   <li><a href="#example-4-hazard-function-analysis" id="toc-example-4-hazard-function-analysis" class="nav-link" data-scroll-target="#example-4-hazard-function-analysis">Example 4: Hazard Function Analysis</a></li>
-  <li><a href="#example-5-visualization-with-ggplot2" id="toc-example-5-visualization-with-ggplot2" class="nav-link" data-scroll-target="#example-5-visualization-with-ggplot2">Example 5: Visualization with ggplot2</a></li>
   <li><a href="#example-6-verify-mills-ratio-properties" id="toc-example-6-verify-mills-ratio-properties" class="nav-link" data-scroll-target="#example-6-verify-mills-ratio-properties">Example 6: Verify Mills Ratio Properties</a></li>
   </ul></li>
   <li><a href="#your-turn" id="toc-your-turn" class="nav-link" data-scroll-target="#your-turn">Your Turn! 🚀</a></li>
@@ -2106,29 +2105,23 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div id="qwebr-insertion-location-5"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
-<section id="example-5-visualization-with-ggplot2" class="level3">
-<h3 class="anchored" data-anchor-id="example-5-visualization-with-ggplot2">Example 5: Visualization with ggplot2</h3>
-<p>Create visualizations of Mills ratios:</p>
-<div id="qwebr-insertion-location-6"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</section>
 <section id="example-6-verify-mills-ratio-properties" class="level3">
 <h3 class="anchored" data-anchor-id="example-6-verify-mills-ratio-properties">Example 6: Verify Mills Ratio Properties</h3>
 <p>Test the theoretical properties of Mills ratios:</p>
-<div id="qwebr-insertion-location-7"></div>
+<div id="qwebr-insertion-location-6"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
 </section>
 <section id="your-turn" class="level2">
 <h2 class="anchored" data-anchor-id="your-turn">Your Turn! 🚀</h2>
 <p>Now try modifying the examples above or write your own code. Here’s a blank cell to get started:</p>
-<div id="qwebr-insertion-location-8"></div>
+<div id="qwebr-insertion-location-7"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
 <section id="advanced-example-monte-carlo-verification" class="level2">
 <h2 class="anchored" data-anchor-id="advanced-example-monte-carlo-verification">Advanced Example: Monte Carlo Verification</h2>
 <p>Verify Mills ratio calculations using simulation:</p>
-<div id="qwebr-insertion-location-9"></div>
+<div id="qwebr-insertion-location-8"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
 <section id="tips-for-using-webr-playground" class="level2">
@@ -2145,12 +2138,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <h2 class="anchored" data-anchor-id="common-tasks">Common Tasks</h2>
 <section id="compare-any-two-distributions" class="level3">
 <h3 class="anchored" data-anchor-id="compare-any-two-distributions">Compare Any Two Distributions</h3>
-<div id="qwebr-insertion-location-10"></div>
+<div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
 <section id="explore-different-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="explore-different-parameters">Explore Different Parameters</h3>
-<div id="qwebr-insertion-location-11"></div>
+<div id="qwebr-insertion-location-10"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </section>
 </section>
@@ -2775,217 +2768,172 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="in">print(head(hazard_comparison, 10))</span></span>
 <span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 5: Visualization with ggplot2</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 6: Verify Mills Ratio Properties</span></span>
 <span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>Create visualizations of Mills ratios:</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>Test the theoretical properties of Mills ratios:</span>
 <span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
-<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="in">library(dplyr)</span></span>
-<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyr)</span></span>
-<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="in"># Generate data for plotting</span></span>
-<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a><span class="in">plot_data &lt;- tibble(x = seq(0.1, 5, length.out = 100)) %&gt;%</span></span>
-<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="in">  mutate(</span></span>
-<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="in">    Normal = mills_ratio_normal(x),</span></span>
-<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="in">    `t(30)` = mills_ratio_t(x, df = 30),</span></span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="in">    `t(3)` = mills_ratio_t(x, df = 3),</span></span>
-<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="in">    Exponential = mills_ratio_exp(x)</span></span>
-<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="in">  ) %&gt;%</span></span>
-<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_longer(-x, names_to = "Distribution", values_to = "Mills_Ratio")</span></span>
-<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="in"># Create the plot</span></span>
-<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="in">p &lt;- ggplot(plot_data, aes(x, Mills_Ratio, color = Distribution)) +</span></span>
-<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_line(linewidth = 1) +</span></span>
-<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10() +</span></span>
-<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="in">  labs(</span></span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="in">    title = "Mills Ratio Comparison Across Distributions",</span></span>
-<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="in">    subtitle = "Log scale reveals tail behavior differences",</span></span>
-<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="in">    x = "x",</span></span>
-<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="in">    y = "Mills Ratio m(x) (log scale)"</span></span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="in">  ) +</span></span>
-<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_minimal() +</span></span>
-<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="in">  theme(</span></span>
-<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="in">    legend.position = "bottom",</span></span>
-<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a><span class="in">    plot.title = element_text(face = "bold", size = 14),</span></span>
-<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="in">    plot.subtitle = element_text(size = 12)</span></span>
-<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="in">  ) +</span></span>
-<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_color_manual(values = c(</span></span>
-<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="in">    "Normal" = "#2E86AB",</span></span>
-<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="in">    "t(30)" = "#A23B72",</span></span>
-<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="in">    "t(3)" = "#F18F01",</span></span>
-<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="in">    "Exponential" = "#C73E1D"</span></span>
-<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="in">  ))</span></span>
-<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="in">print(p)</span></span>
-<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 6: Verify Mills Ratio Properties</span></span>
-<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>Test the theoretical properties of Mills ratios:</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 1: Normal has decreasing Mills ratio (thin tails)</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="in">x_test &lt;- seq(1, 5, by = 0.5)</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="in">m_normal &lt;- mills_ratio_normal(x_test)</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="in">normal_decreasing &lt;- all(diff(m_normal) &lt; 0)</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Normal Mills ratio is decreasing:", normal_decreasing, "\n")</span></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 2: t(3) has increasing Mills ratio (fat tails)</span></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="in">m_t3 &lt;- mills_ratio_t(x_test, df = 3)</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="in">t3_increasing &lt;- all(diff(m_t3) &gt; 0)</span></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="in">cat("t(3) Mills ratio is increasing:", t3_increasing, "\n")</span></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 3: Exponential has constant Mills ratio</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="in">m_exp &lt;- mills_ratio_exp(x_test)</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="in">exp_constant &lt;- all(abs(diff(m_exp)) &lt; 1e-10)</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Exponential Mills ratio is constant:", exp_constant, "\n")</span></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 4: Hazard function properties</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="in">h_normal &lt;- hazard_function(x_test, "normal")</span></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="in">normal_hazard_increasing &lt;- all(diff(h_normal) &gt; 0)</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nNormal hazard is increasing (IFR):", normal_hazard_increasing, "\n")</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="in"># Display the values</span></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nMills Ratio Values:\n")</span></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="in">results &lt;- data.frame(</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="in">  x = x_test,</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="in">  Normal = round(m_normal, 3),</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="in">  `t(3)` = round(m_t3, 3),</span></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a><span class="in">  Exponential = round(m_exp, 3)</span></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="in">print(results)</span></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="fu">## Your Turn! 🚀</span></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>Now try modifying the examples above or write your own code. Here's a blank cell to get started:</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="in"># Your code here!</span></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="in"># Try:</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="in"># 1. Different x values</span></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="in"># 2. Different degrees of freedom for t-distribution</span></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="in"># 3. Create your own visualizations</span></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="in"># 4. Explore hazard functions</span></span>
 <span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 1: Normal has decreasing Mills ratio (thin tails)</span></span>
-<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="in">x_test &lt;- seq(1, 5, by = 0.5)</span></span>
-<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="in">m_normal &lt;- mills_ratio_normal(x_test)</span></span>
-<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="in">normal_decreasing &lt;- all(diff(m_normal) &lt; 0)</span></span>
-<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Normal Mills ratio is decreasing:", normal_decreasing, "\n")</span></span>
-<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 2: t(3) has increasing Mills ratio (fat tails)</span></span>
-<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="in">m_t3 &lt;- mills_ratio_t(x_test, df = 3)</span></span>
-<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="in">t3_increasing &lt;- all(diff(m_t3) &gt; 0)</span></span>
-<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="in">cat("t(3) Mills ratio is increasing:", t3_increasing, "\n")</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Advanced Example: Monte Carlo Verification</span></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>Verify Mills ratio calculations using simulation:</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="in"># Monte Carlo verification of Mills ratio</span></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="in">set.seed(123)</span></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="in">n_sim &lt;- 10000</span></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="in">x_val &lt;- 2</span></span>
 <span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 3: Exponential has constant Mills ratio</span></span>
-<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="in">m_exp &lt;- mills_ratio_exp(x_test)</span></span>
-<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="in">exp_constant &lt;- all(abs(diff(m_exp)) &lt; 1e-10)</span></span>
-<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Exponential Mills ratio is constant:", exp_constant, "\n")</span></span>
-<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a><span class="in"># Test 4: Hazard function properties</span></span>
-<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="in">h_normal &lt;- hazard_function(x_test, "normal")</span></span>
-<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="in">normal_hazard_increasing &lt;- all(diff(h_normal) &gt; 0)</span></span>
-<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nNormal hazard is increasing (IFR):", normal_hazard_increasing, "\n")</span></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="in"># Simulate from standard normal</span></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="in">samples &lt;- rnorm(n_sim)</span></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="in"># Empirical Mills ratio</span></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="in">survivors &lt;- samples[samples &gt; x_val]</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a><span class="in">empirical_mills &lt;- length(survivors) / n_sim / dnorm(x_val)</span></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="in"># Theoretical Mills ratio</span></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="in">theoretical_mills &lt;- mills_ratio_normal(x_val)</span></span>
 <span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="in"># Display the values</span></span>
-<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nMills Ratio Values:\n")</span></span>
-<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="in">results &lt;- data.frame(</span></span>
-<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="in">  x = x_test,</span></span>
-<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="in">  Normal = round(m_normal, 3),</span></span>
-<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="in">  `t(3)` = round(m_t3, 3),</span></span>
-<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="in">  Exponential = round(m_exp, 3)</span></span>
-<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="in">print(results)</span></span>
-<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a><span class="fu">## Your Turn! 🚀</span></span>
-<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>Now try modifying the examples above or write your own code. Here's a blank cell to get started:</span>
-<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="in"># Your code here!</span></span>
-<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a><span class="in"># Try:</span></span>
-<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="in"># 1. Different x values</span></span>
-<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="in"># 2. Different degrees of freedom for t-distribution</span></span>
-<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="in"># 3. Create your own visualizations</span></span>
-<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a><span class="in"># 4. Explore hazard functions</span></span>
-<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## Advanced Example: Monte Carlo Verification</span></span>
-<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>Verify Mills ratio calculations using simulation:</span>
-<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="in"># Monte Carlo verification of Mills ratio</span></span>
-<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="in">set.seed(123)</span></span>
-<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a><span class="in">n_sim &lt;- 10000</span></span>
-<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="in">x_val &lt;- 2</span></span>
-<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a><span class="in"># Simulate from standard normal</span></span>
-<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="in">samples &lt;- rnorm(n_sim)</span></span>
-<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="in"># Empirical Mills ratio</span></span>
-<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="in">survivors &lt;- samples[samples &gt; x_val]</span></span>
-<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="in">empirical_mills &lt;- length(survivors) / n_sim / dnorm(x_val)</span></span>
-<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="in"># Theoretical Mills ratio</span></span>
-<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a><span class="in">theoretical_mills &lt;- mills_ratio_normal(x_val)</span></span>
-<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="in"># Compare</span></span>
-<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Monte Carlo Verification (n =", n_sim, "simulations)\n")</span></span>
-<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="in">cat("========================================\n")</span></span>
-<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="in">cat("x value:", x_val, "\n")</span></span>
-<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Empirical Mills ratio:", round(empirical_mills, 4), "\n")</span></span>
-<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Theoretical Mills ratio:", round(theoretical_mills, 4), "\n")</span></span>
-<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Relative error:", round(abs(empirical_mills - theoretical_mills) / theoretical_mills * 100, 2), "%\n")</span></span>
-<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="in"># Try with t-distribution</span></span>
-<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="in">t_samples &lt;- rt(n_sim, df = 30)</span></span>
-<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="in">t_survivors &lt;- t_samples[t_samples &gt; x_val]</span></span>
-<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a><span class="in">empirical_t_mills &lt;- length(t_survivors) / n_sim / dt(x_val, df = 30)</span></span>
-<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a><span class="in">theoretical_t_mills &lt;- mills_ratio_t(x_val, df = 30)</span></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="in"># Compare</span></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Monte Carlo Verification (n =", n_sim, "simulations)\n")</span></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="in">cat("========================================\n")</span></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="in">cat("x value:", x_val, "\n")</span></span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Empirical Mills ratio:", round(empirical_mills, 4), "\n")</span></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Theoretical Mills ratio:", round(theoretical_mills, 4), "\n")</span></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Relative error:", round(abs(empirical_mills - theoretical_mills) / theoretical_mills * 100, 2), "%\n")</span></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="in"># Try with t-distribution</span></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="in">t_samples &lt;- rt(n_sim, df = 30)</span></span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="in">t_survivors &lt;- t_samples[t_samples &gt; x_val]</span></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a><span class="in">empirical_t_mills &lt;- length(t_survivors) / n_sim / dt(x_val, df = 30)</span></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="in">theoretical_t_mills &lt;- mills_ratio_t(x_val, df = 30)</span></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nt(30) Distribution:\n")</span></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Empirical Mills ratio:", round(empirical_t_mills, 4), "\n")</span></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Theoretical Mills ratio:", round(theoretical_t_mills, 4), "\n")</span></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Relative error:", round(abs(empirical_t_mills - theoretical_t_mills) / theoretical_t_mills * 100, 2), "%\n")</span></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tips for Using WebR Playground</span></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Click "Run Code"** to execute any code block</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Modify examples** directly in the code cells</span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**All tidyverse packages** are available (dplyr, ggplot2, tidyr, purrr)</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Mills ratio functions** are pre-loaded - no installation needed</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Results appear** immediately below each code block</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="fu">## Common Tasks</span></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="fu">### Compare Any Two Distributions</span></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="in"># Customize this example with your own parameters</span></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="in">x_range &lt;- seq(0.5, 4, by = 0.5)</span></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="in"># Choose your distributions</span></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a><span class="in">dist1 &lt;- mills_ratio_normal(x_range)</span></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="in">dist2 &lt;- mills_ratio_t(x_range, df = 10)  # Change df as needed</span></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="in"># Create comparison</span></span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="in">comparison &lt;- data.frame(</span></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="in">  x = x_range,</span></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a><span class="in">  Distribution1 = dist1,</span></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a><span class="in">  Distribution2 = dist2,</span></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="in">  Ratio = dist2 / dist1,</span></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="in">  Percent_Diff = (dist2 / dist1 - 1) * 100</span></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="in">print(comparison)</span></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="in"># Find crossover point (if any)</span></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="in">if(any(diff(sign(dist1 - dist2)) != 0)) {</span></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="in">  cat("\nDistributions cross over in the given range!\n")</span></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="in">  cat("\nNo crossover in the given range.\n")</span></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nt(30) Distribution:\n")</span></span>
-<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Empirical Mills ratio:", round(empirical_t_mills, 4), "\n")</span></span>
-<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Theoretical Mills ratio:", round(theoretical_t_mills, 4), "\n")</span></span>
-<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="in">cat("Relative error:", round(abs(empirical_t_mills - theoretical_t_mills) / theoretical_t_mills * 100, 2), "%\n")</span></span>
-<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tips for Using WebR Playground</span></span>
-<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Click "Run Code"** to execute any code block</span>
-<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Modify examples** directly in the code cells</span>
-<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**All tidyverse packages** are available (dplyr, ggplot2, tidyr, purrr)</span>
-<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Mills ratio functions** are pre-loaded - no installation needed</span>
-<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Results appear** immediately below each code block</span>
-<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="fu">## Common Tasks</span></span>
-<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="fu">### Compare Any Two Distributions</span></span>
-<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="in"># Customize this example with your own parameters</span></span>
-<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="in">x_range &lt;- seq(0.5, 4, by = 0.5)</span></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explore Different Parameters</span></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="in"># Explore how degrees of freedom affect t-distribution Mills ratio</span></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a><span class="in">x &lt;- 3  # Fixed point</span></span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="in">df_values &lt;- c(1, 2, 3, 5, 10, 20, 30, 50, 100, 1000)</span></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="in">results &lt;- data.frame(</span></span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="in">  df = df_values,</span></span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="in">  mills_ratio = sapply(df_values, function(d) mills_ratio_t(x, df = d)),</span></span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="in">  normal_limit = mills_ratio_normal(x)</span></span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a><span class="in">cat("t-distribution Mills ratio at x =", x, "for different df:\n")</span></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="in">cat("=====================================================\n")</span></span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a><span class="in">print(results)</span></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nObservation: As df increases, t-distribution approaches normal.\n")</span></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
 <span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="in"># Choose your distributions</span></span>
-<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a><span class="in">dist1 &lt;- mills_ratio_normal(x_range)</span></span>
-<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="in">dist2 &lt;- mills_ratio_t(x_range, df = 10)  # Change df as needed</span></span>
-<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a><span class="in"># Create comparison</span></span>
-<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a><span class="in">comparison &lt;- data.frame(</span></span>
-<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a><span class="in">  x = x_range,</span></span>
-<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a><span class="in">  Distribution1 = dist1,</span></span>
-<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="in">  Distribution2 = dist2,</span></span>
-<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a><span class="in">  Ratio = dist2 / dist1,</span></span>
-<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="in">  Percent_Diff = (dist2 / dist1 - 1) * 100</span></span>
-<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Mills Ratio Theory</span><span class="co">](theory.qmd)</span></span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Dashboard Documentation</span><span class="co">](dashboard.qmd)</span></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Applications</span><span class="co">](applications.qmd)</span></span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">GitHub Repository</span><span class="co">](https://github.com/JohnGavin/millsratio)</span></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a><span class="fu">## Troubleshooting</span></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a>If code doesn't run:</span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Make sure you clicked "Run Code"</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Check for typos in function names</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ensure required libraries are loaded</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Refresh the page if WebR becomes unresponsive</span>
 <span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a><span class="in">print(comparison)</span></span>
-<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a><span class="in"># Find crossover point (if any)</span></span>
-<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a><span class="in">if(any(diff(sign(dist1 - dist2)) != 0)) {</span></span>
-<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a><span class="in">  cat("\nDistributions cross over in the given range!\n")</span></span>
-<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
-<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a><span class="in">  cat("\nNo crossover in the given range.\n")</span></span>
-<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explore Different Parameters</span></span>
-<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a><span class="in">```{webr-r}</span></span>
-<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a><span class="in"># Explore how degrees of freedom affect t-distribution Mills ratio</span></span>
-<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a><span class="in">x &lt;- 3  # Fixed point</span></span>
-<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a><span class="in">df_values &lt;- c(1, 2, 3, 5, 10, 20, 30, 50, 100, 1000)</span></span>
-<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a><span class="in">results &lt;- data.frame(</span></span>
-<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a><span class="in">  df = df_values,</span></span>
-<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a><span class="in">  mills_ratio = sapply(df_values, function(d) mills_ratio_t(x, df = d)),</span></span>
-<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a><span class="in">  normal_limit = mills_ratio_normal(x)</span></span>
-<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a><span class="in">cat("t-distribution Mills ratio at x =", x, "for different df:\n")</span></span>
-<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a><span class="in">cat("=====================================================\n")</span></span>
-<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a><span class="in">print(results)</span></span>
-<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a><span class="in">cat("\nObservation: As df increases, t-distribution approaches normal.\n")</span></span>
-<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
-<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Mills Ratio Theory</span><span class="co">](theory.qmd)</span></span>
-<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Dashboard Documentation</span><span class="co">](dashboard.qmd)</span></span>
-<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Applications</span><span class="co">](applications.qmd)</span></span>
-<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">GitHub Repository</span><span class="co">](https://github.com/JohnGavin/millsratio)</span></span>
-<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Troubleshooting</span></span>
-<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a>If code doesn't run:</span>
-<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Make sure you clicked "Run Code"</span>
-<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Check for typos in function names</span>
-<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ensure required libraries are loaded</span>
-<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Refresh the page if WebR becomes unresponsive</span>
-<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a>Happy exploring! 🎯</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a>Happy exploring! 🎯</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <script type="module">
