@@ -12,89 +12,29 @@ engine: knitr
 filters:
   - ../_extensions/coatless/webr/webr.lua
 webr:
-  packages: ['dplyr', 'tidyr']
+  packages: ['millsratio', 'dplyr', 'tidyr']
+  channel-type: 'custom'
+  repo-url: 'https://johngavin.github.io/millsratio/webr/'
 ---
 
 ## Welcome to the WebR Playground
 
 This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
 
-### Function Setup
+The `millsratio` package is compiled to WebAssembly and loaded automatically from our custom WebR repository.
 
-First, we define the core Mills ratio functions:
+### Package Setup
+
+First, we load the millsratio package:
 
 ```{webr-r}
 #| autorun: true
 #| context: setup
 
-# Core Mills ratio functions
-mills_ratio_normal <- function(x, mean = 0, sd = 1, log = FALSE) {
-  z <- (x - mean) / sd
-  if (log) {
-    log_mills <- pnorm(z, lower.tail = FALSE, log.p = TRUE) - dnorm(z, log = TRUE)
-    return(log_mills)
-  } else {
-    mills <- pnorm(z, lower.tail = FALSE) / dnorm(z)
-    return(mills)
-  }
-}
+# Load the compiled millsratio package
+library(millsratio)
 
-mills_ratio_t <- function(x, df, log = FALSE) {
-  if (missing(df) || df <= 0) {
-    stop("Degrees of freedom (df) must be positive")
-  }
-  if (log) {
-    log_mills <- pt(x, df = df, lower.tail = FALSE, log.p = TRUE) - dt(x, df = df, log = TRUE)
-    return(log_mills)
-  } else {
-    mills <- pt(x, df = df, lower.tail = FALSE) / dt(x, df = df)
-    return(mills)
-  }
-}
-
-mills_ratio_exp <- function(x, rate = 1, log = FALSE) {
-  if (rate <= 0) stop("Rate parameter must be positive")
-  n <- length(x)
-  mills <- rep(1/rate, n)
-  mills[x < 0] <- NA
-  if (log) return(log(mills)) else return(mills)
-}
-
-# Hazard function helpers
-hazard_from_mills <- function(mills_ratio) {
-  1 / mills_ratio
-}
-
-hazard_function <- function(x, distribution = "normal", ...) {
-  f <- switch(distribution,
-    normal = dnorm(x, ...),
-    t = dt(x, ...),
-    exponential = dexp(x, ...),
-    stop("Unknown distribution: ", distribution)
-  )
-  survival <- switch(distribution,
-    normal = pnorm(x, ..., lower.tail = FALSE),
-    t = pt(x, ..., lower.tail = FALSE),
-    exponential = pexp(x, ..., lower.tail = FALSE)
-  )
-  f / survival
-}
-
-# t(30) paradox analysis
-analyze_t30_paradox <- function(x_range = c(0, 5), n_points = 200) {
-  x_vals <- seq(x_range[1], x_range[2], length.out = n_points)
-  m_normal <- mills_ratio_normal(x_vals)
-  m_t30 <- mills_ratio_t(x_vals, df = 30)
-
-  data.frame(
-    x = x_vals,
-    normal = m_normal,
-    t30 = m_t30,
-    ratio = m_t30 / m_normal
-  )
-}
-
-cat("Mills ratio functions loaded successfully!\n")
+cat("millsratio package loaded successfully!\n")
 cat("Available functions:\n")
 cat("- mills_ratio_normal()\n")
 cat("- mills_ratio_t()\n")

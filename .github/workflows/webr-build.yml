@@ -8,7 +8,7 @@ on:
   workflow_dispatch:  # Allow manual triggers for testing
 
 permissions:
-  contents: read
+  contents: write  # Changed to write for deployment
   repository-projects: read   # Needed to access GitHub Packages
 
 jobs:
@@ -32,3 +32,12 @@ jobs:
           name: webr-repo
           path: _site/
           retention-days: 7
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          destination_dir: webr
+          keep_files: true  # Don't delete other content on gh-pages
