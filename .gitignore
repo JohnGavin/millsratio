@@ -1,6 +1,4 @@
-docs
 nix-shell-root
 
 /.quarto/
-docs/
 .DS_Store

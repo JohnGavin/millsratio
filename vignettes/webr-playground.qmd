@@ -12,14 +12,13 @@ engine: knitr
 filters:
   - ../_extensions/coatless/webr/webr.lua
 webr:
-  packages: ['ggplot2', 'dplyr', 'tidyr', 'purrr', 'millsratio']
-  autoload-packages: true
+  packages: ['millsratio']
   repos:
     - https://johngavin.github.io/millsratio/webr-packages
     - https://repo.r-wasm.org
 ---
 
-## Welcome to the WebR Playground! 🎮
+## Welcome to the WebR Playground
 
 This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!
 
@@ -29,17 +28,9 @@ The millsratio package is automatically loaded from our WebR repository. All fun
 
 ```{webr-r}
 #| autorun: true
-# Verify millsratio package is loaded
-if (!requireNamespace("millsratio", quietly = TRUE)) {
-  # Fallback: Install from WebR repository if not auto-loaded
-  install.packages("millsratio",
-                   repos = c("https://johngavin.github.io/millsratio/webr-packages",
-                             "https://repo.r-wasm.org"))
-}
 library(millsratio)
 
 # Display available functions
-cat("millsratio package loaded successfully!\n")
 cat("Available functions:\n")
 ls("package:millsratio") |>
   paste(collapse = "\n- ") |>

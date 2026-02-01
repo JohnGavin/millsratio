@@ -97,5 +97,68 @@
       "WebR Playground",
       "Interactive WebR Playground"
     ]
+  },
+  {
+    "objectID": "vignettes/webr-playground.html",
+    "href": "vignettes/webr-playground.html",
+    "title": "Interactive WebR Playground",
+    "section": "",
+    "text": "This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!\n\n\nThe millsratio package is automatically loaded from our WebR repository. All functions are ready to use:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#welcome-to-the-webr-playground",
+    "href": "vignettes/webr-playground.html#welcome-to-the-webr-playground",
+    "title": "Interactive WebR Playground",
+    "section": "",
+    "text": "This interactive environment lets you run Mills ratio examples directly in your browser - no R installation required!\n\n\nThe millsratio package is automatically loaded from our WebR repository. All functions are ready to use:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#quick-start-examples",
+    "href": "vignettes/webr-playground.html#quick-start-examples",
+    "title": "Interactive WebR Playground",
+    "section": "Quick Start Examples",
+    "text": "Quick Start Examples\n\nExample 1: Basic Mills Ratio Calculation\nTry calculating Mills ratios for different distributions. Click “Run Code” to execute:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExample 2: The t(30) Paradox\nExplore why t(30) appears normal but has fatter tails:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExample 3: Tidyverse Analysis\nUse dplyr and tidyr for Mills ratio analysis:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExample 4: Hazard Function Analysis\nExplore the relationship between Mills ratio and hazard function:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExample 5: Visualization with ggplot2\nCreate visualizations of Mills ratios:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExample 6: Verify Mills Ratio Properties\nTest the theoretical properties of Mills ratios:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#your-turn",
+    "href": "vignettes/webr-playground.html#your-turn",
+    "title": "Interactive WebR Playground",
+    "section": "Your Turn! 🚀",
+    "text": "Your Turn! 🚀\nNow try modifying the examples above or write your own code. Here’s a blank cell to get started:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#advanced-example-monte-carlo-verification",
+    "href": "vignettes/webr-playground.html#advanced-example-monte-carlo-verification",
+    "title": "Interactive WebR Playground",
+    "section": "Advanced Example: Monte Carlo Verification",
+    "text": "Advanced Example: Monte Carlo Verification\nVerify Mills ratio calculations using simulation:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#tips-for-using-webr-playground",
+    "href": "vignettes/webr-playground.html#tips-for-using-webr-playground",
+    "title": "Interactive WebR Playground",
+    "section": "Tips for Using WebR Playground",
+    "text": "Tips for Using WebR Playground\n\nClick “Run Code” to execute any code block\nModify examples directly in the code cells\nAll tidyverse packages are available (dplyr, ggplot2, tidyr, purrr)\nMills ratio functions are pre-loaded - no installation needed\nResults appear immediately below each code block"
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#common-tasks",
+    "href": "vignettes/webr-playground.html#common-tasks",
+    "title": "Interactive WebR Playground",
+    "section": "Common Tasks",
+    "text": "Common Tasks\n\nCompare Any Two Distributions\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nExplore Different Parameters\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#resources",
+    "href": "vignettes/webr-playground.html#resources",
+    "title": "Interactive WebR Playground",
+    "section": "Resources",
+    "text": "Resources\n\nMills Ratio Theory\nDashboard Documentation\nApplications\nGitHub Repository"
+  },
+  {
+    "objectID": "vignettes/webr-playground.html#troubleshooting",
+    "href": "vignettes/webr-playground.html#troubleshooting",
+    "title": "Interactive WebR Playground",
+    "section": "Troubleshooting",
+    "text": "Troubleshooting\nIf code doesn’t run: 1. Make sure you clicked “Run Code” 2. Check for typos in function names 3. Ensure required libraries are loaded 4. Refresh the page if WebR becomes unresponsive\nHappy exploring! 🎯"
   }
 ]
