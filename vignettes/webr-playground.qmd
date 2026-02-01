@@ -149,51 +149,6 @@ cat("\nHazard Function Comparison:\n")
 print(head(hazard_comparison, 10))
 ```
 
-### Example 5: Visualization with ggplot2
-
-Create visualizations of Mills ratios:
-
-```{webr-r}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Generate data for plotting
-plot_data <- tibble(x = seq(0.1, 5, length.out = 100)) %>%
-  mutate(
-    Normal = mills_ratio_normal(x),
-    `t(30)` = mills_ratio_t(x, df = 30),
-    `t(3)` = mills_ratio_t(x, df = 3),
-    Exponential = mills_ratio_exp(x)
-  ) %>%
-  pivot_longer(-x, names_to = "Distribution", values_to = "Mills_Ratio")
-
-# Create the plot
-p <- ggplot(plot_data, aes(x, Mills_Ratio, color = Distribution)) +
-  geom_line(linewidth = 1) +
-  scale_y_log10() +
-  labs(
-    title = "Mills Ratio Comparison Across Distributions",
-    subtitle = "Log scale reveals tail behavior differences",
-    x = "x",
-    y = "Mills Ratio m(x) (log scale)"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    plot.title = element_text(face = "bold", size = 14),
-    plot.subtitle = element_text(size = 12)
-  ) +
-  scale_color_manual(values = c(
-    "Normal" = "#2E86AB",
-    "t(30)" = "#A23B72",
-    "t(3)" = "#F18F01",
-    "Exponential" = "#C73E1D"
-  ))
-
-print(p)
-```
-
 ### Example 6: Verify Mills Ratio Properties
 
 Test the theoretical properties of Mills ratios:
