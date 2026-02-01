@@ -202,7 +202,7 @@ Now try modifying the examples above or write your own code. Here's a blank cell
 # Try:
 # 1. Different x values
 # 2. Different degrees of freedom for t-distribution
-# 3. Create your own visualizations
+# 3. Create tables and comparisons (avoid ggplot2 - use base R plot() if needed)
 # 4. Explore hazard functions
 
 ```
@@ -251,7 +251,7 @@ cat("Relative error:", round(abs(empirical_t_mills - theoretical_t_mills) / theo
 
 1. **Click "Run Code"** to execute any code block
 2. **Modify examples** directly in the code cells
-3. **All tidyverse packages** are available (dplyr, ggplot2, tidyr, purrr)
+3. **Core tidyverse packages** are available (dplyr, tidyr) - Note: ggplot2 has known issues with WebR, use base plotting instead
 4. **Mills ratio functions** are pre-loaded - no installation needed
 5. **Results appear** immediately below each code block
 
