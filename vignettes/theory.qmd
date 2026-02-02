@@ -46,7 +46,6 @@ $$m(x) \sim \frac{1}{x} - \frac{1}{x^3} + \frac{3}{x^5} - \cdots$$
 The leading term $1/x$ dominates, indicating thin tails.
 
 ```{r normal-asymptotic}
-#| eval: false
 x <- seq(2, 10, by = 0.5)
 mills_exact <- mills_ratio_normal(x)
 mills_approx <- 1/x
@@ -86,7 +85,6 @@ $$\frac{1}{x + 1/x} < m(x) < \frac{1}{x}$$
 These bounds become tighter as $x$ increases.
 
 ```{r bounds-visualization}
-#| eval: false
 x <- seq(1, 5, by = 0.1)
 mills <- mills_ratio_normal(x)
 lower_bound <- 1/(x + 1/x)
@@ -158,7 +156,6 @@ Mills ratios appear in the study of:
 For large $x$, direct computation can be unstable. Use:
 
 ```{r numerical-tips}
-#| eval: false
 # Unstable for large x
 unstable_mills <- function(x) {
   pnorm(x, lower.tail = FALSE) / dnorm(x)

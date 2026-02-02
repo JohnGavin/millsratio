@@ -39,7 +39,6 @@ This article benchmarks the millsratio package functions for:
 ### Single Value Calculations
 
 ```{r single-value-bench}
-#| eval: false
 if (has_microbenchmark) {
   # Benchmark single value calculations
   x_single <- 2.5
@@ -61,7 +60,6 @@ if (has_microbenchmark) {
 ### Vectorized Operations
 
 ```{r vector-bench}
-#| eval: false
 # Benchmark vector operations
 x_vector <- seq(0.1, 10, by = 0.1)  # 100 values
 
@@ -85,7 +83,6 @@ autoplot(bench_vector) +
 ### Scaling Analysis
 
 ```{r scaling-analysis}
-#| eval: false
 # How does performance scale with input size?
 sizes <- c(10, 100, 1000, 10000, 100000)
 times <- numeric(length(sizes))
@@ -127,7 +124,6 @@ ggplot(scaling_data, aes(size, time_ms)) +
 ### Comparison with High-Precision Computation
 
 ```{r accuracy-test}
-#| eval: false
 # Test accuracy against high-precision alternatives
 test_points <- c(0.1, 0.5, 1, 2, 3, 5, 10, 20)
 
@@ -161,7 +157,6 @@ print(accuracy_df %>%
 ### Extreme Value Accuracy
 
 ```{r extreme-values}
-#| eval: false
 # Test at extreme values where numerical issues arise
 extreme_x <- c(30, 35, 37, 38, 39)
 
@@ -194,7 +189,6 @@ cat("Package approach NaN/Inf:", sum(!is.finite(extreme_df$package)), "\n")
 ## Memory Efficiency
 
 ```{r memory-benchmark}
-#| eval: false
 # Memory usage comparison
 library(pryr)
 
@@ -224,7 +218,6 @@ cat("Ratio:", mem_results$loop / mem_results$vectorized, "x more for loop\n")
 ## Comparison with Other Packages
 
 ```{r package-comparison}
-#| eval: false
 # Compare with other implementations (if available)
 compare_implementations <- function(x) {
   results <- list(
@@ -264,7 +257,6 @@ print(bench_impl)
 ### Vectorization Benefits
 
 ```{r vectorization-benefits}
-#| eval: false
 # Compare vectorized vs loop performance
 vector_approach <- function(x) {
   mills_ratio_normal(x)
@@ -303,7 +295,6 @@ cat("Apply vs Vectorized:", times[3] / times[1], "x\n")
 ### Caching for Repeated Calculations
 
 ```{r caching-demo}
-#| eval: false
 # Implement simple caching for repeated values
 create_cached_mills <- function() {
   cache <- new.env()
@@ -336,7 +327,6 @@ print(cache_bench)
 ## Platform Comparison
 
 ```{r platform-info}
-#| eval: false
 # System information
 cat("Benchmark Platform:\n")
 cat("R version:", R.version.string, "\n")
@@ -361,7 +351,6 @@ Based on benchmarking results:
 ## Summary Statistics
 
 ```{r summary-stats}
-#| eval: false
 # Overall performance summary
 performance_summary <- data.frame(
   Operation = c(

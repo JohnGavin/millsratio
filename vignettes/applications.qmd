@@ -31,7 +31,6 @@ Mills ratios appear in diverse fields from financial risk management to reliabil
 In risk management, the Mills ratio helps calculate expected losses beyond VaR:
 
 ```{r var-example}
-#| eval: false
 # Portfolio with normal returns
 mu <- 0.001  # Daily return
 sigma <- 0.02  # Daily volatility
@@ -54,7 +53,6 @@ cat("ES/VaR ratio:", round(expected_shortfall / (mu + sigma * z_var), 2))
 Mills ratios appear in exotic option formulas:
 
 ```{r option-pricing}
-#| eval: false
 # Digital option delta using Mills ratio
 digital_delta <- function(S, K, r, sigma, T) {
   d2 <- (log(S/K) + (r - 0.5*sigma^2)*T) / (sigma*sqrt(T))
@@ -83,7 +81,6 @@ digital_delta(S, K, r, sigma, T)
 For components with lifetime distribution, the mean residual life at age $t$ is:
 
 ```{r mean-residual-life}
-#| eval: false
 # Mean residual life function
 mean_residual_life <- function(t, distribution = "normal", ...) {
   if (distribution == "normal") {
@@ -113,7 +110,6 @@ data.frame(
 For series systems with component lifetimes:
 
 ```{r system-reliability}
-#| eval: false
 # Series system with n components
 series_system_mills <- function(x, n_components, dist = "normal") {
   # Individual component Mills ratio
@@ -143,7 +139,6 @@ series_system_mills(x = 2, n_components = 5)
 In Tobit models and truncated regression:
 
 ```{r truncated-regression}
-#| eval: false
 # Heckman correction using Mills ratio
 heckman_correction <- function(z_scores) {
   # Selection equation produces z-scores
@@ -174,7 +169,6 @@ abline(v = 0, lty = 2)
 Mills ratio in survival probability calculations:
 
 ```{r survival-analysis}
-#| eval: false
 # Survival function using Mills ratio
 survival_probability <- function(t, dist = "normal", ...) {
   if (dist == "normal") {
@@ -212,7 +206,6 @@ ggplot(plot_data, aes(time, Survival, color = Distribution)) +
 Mills ratio in capability indices:
 
 ```{r process-capability}
-#| eval: false
 # Enhanced process capability using Mills ratio
 process_capability_mills <- function(USL, LSL, mu, sigma) {
   # Standard capability indices
@@ -250,7 +243,6 @@ process_capability_mills(USL = 6, LSL = -6, mu = 0, sigma = 1)
 Using Mills ratio for anomaly scores:
 
 ```{r outlier-detection}
-#| eval: false
 # Anomaly score based on Mills ratio
 anomaly_score <- function(x, robust = TRUE) {
   if (robust) {
@@ -298,7 +290,6 @@ abline(h = threshold, lty = 2, col = "red")
 ### Excess-of-Loss Pricing
 
 ```{r reinsurance}
-#| eval: false
 # Reinsurance premium calculation
 excess_loss_premium <- function(retention, limit, mu, sigma) {
   # Standardize retention and limit

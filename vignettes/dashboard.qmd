@@ -53,7 +53,6 @@ The simplified dashboard focuses on essential functionality:
 Launch it with:
 
 ```{r}
-#| eval: false
 launch_dashboard_simple()
 ```
 
@@ -82,7 +81,6 @@ The comprehensive dashboard is organized into three main sections:
 Launch it with:
 
 ```{r}
-#| eval: false
 launch_dashboard()
 ```
 

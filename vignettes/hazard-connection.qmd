@@ -14,10 +14,10 @@ format:
 ```{r setup}
 #| message: false
 #| warning: false
-library(millsratio)
+devtools::load_all()  # Load development version
 library(tidyverse)
 library(plotly)
-library(gt)  # Now available in Nix environment
+# library(gt)  # Replaced with knitr::kable()
 ```
 
 ## Mathematical Relationship
@@ -54,9 +54,10 @@ df <- tibble(x = seq(0.1, 5, by = 0.1)) %>%
 # Display first few rows
 df %>%
   head(10) %>%
-  gt() %>%
-  fmt_number(columns = c(mills_ratio, hazard_method1, hazard_method2), decimals = 4) %>%
-  tab_header(title = "Mills Ratio vs Hazard Function")
+  knitr::kable(
+    digits = 4,
+    caption = "Mills Ratio vs Hazard Function"
+  )
 ```
 
 ### Visualize the Relationship
@@ -86,7 +87,7 @@ p <- plot_data %>%
     labels = c("mills_ratio" = "Mills Ratio m(x)", "hazard" = "Hazard h(x)")
   )
 
-ggplotly(p)
+ ggplotly(p)
 ```
 
 ## Compare Across Distributions
@@ -149,11 +150,9 @@ hazard_analysis <- comparison %>%
   )
 
 hazard_analysis %>%
-  gt() %>%
-  fmt_number(columns = c(min_hazard, max_hazard), decimals = 4) %>%
-  tab_header(
-    title = "Hazard Function Properties by Distribution",
-    subtitle = "IFR = Increasing Failure Rate, DFR = Decreasing, CFR = Constant"
+  knitr::kable(
+    digits = 4,
+    caption = "Hazard Function Properties by Distribution (IFR = Increasing Failure Rate, DFR = Decreasing, CFR = Constant)"
   )
 ```
 
@@ -226,8 +225,9 @@ reliability_summary <- reliability_data %>%
   )
 
 reliability_summary %>%
-  gt() %>%
-  tab_header(title = "Component Life Estimates from Hazard Model")
+  knitr::kable(
+    caption = "Component Life Estimates from Hazard Model"
+  )
 ```
 
 ## Key Insights
@@ -280,9 +280,10 @@ results <- analysis_pipeline(
 )
 
 results %>%
-  gt() %>%
-  fmt_number(decimals = 3) %>%
-  tab_header(title = "Distribution Comparison Summary")
+  knitr::kable(
+    digits = 3,
+    caption = "Distribution Comparison Summary"
+  )
 ```
 
 ## Conclusion
