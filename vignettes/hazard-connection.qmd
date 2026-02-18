@@ -8,16 +8,19 @@ format:
     code-fold: true
     code-summary: "Show code"
     code-tools: true
+    output-fold: true
+    output-summary: "Show output"
     toc: true
 ---
 
 ```{r setup}
 #| message: false
 #| warning: false
-devtools::load_all()  # Load development version
-library(tidyverse)
+library(millsratio)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 library(plotly)
-# library(gt)  # Replaced with knitr::kable()
 ```
 
 ## Mathematical Relationship
@@ -31,87 +34,79 @@ This fundamental relationship connects two important concepts:
 - **Mills ratio** $m(x)$: Used in statistics and economics to measure tail thickness
 - **Hazard function** $h(x)$: Used in survival analysis and reliability engineering
 
-## Tidyverse Implementation
+## Numerical Verification: h(x) = 1/m(x) {#numerical-verification}
 
-### Calculate Both Functions
+We verify the reciprocal identity numerically across all distributions.
 
-```{r calculate-both}
-# Create data frame with both functions
-df <- tibble(x = seq(0.1, 5, by = 0.1)) %>%
-  mutate(
-    # Mills ratio calculation
-    mills_ratio = mills_ratio_normal(x),
+```{r verification-table}
+# Load precomputed verification table
+verification <- readRDS(
+  system.file("extdata", "hazard_verification_table.rds", package = "millsratio")
+)
 
-    # Hazard function - two equivalent methods
-    hazard_method1 = 1 / mills_ratio,
-    hazard_method2 = dnorm(x) / pnorm(x, lower.tail = FALSE)
+verification %>%
+  select(distribution, x, mills_ratio, hazard, product, abs_error) %>%
+  knitr::kable(
+    digits = 12,
+    caption = "Verification: m(x) * h(x) = 1 for all distributions and x values"
+  )
+```
+
+The `product` column shows that $m(x) \times h(x) = 1$ to machine precision for every distribution and every $x$ value, confirming the reciprocal relationship.
+
+## Side-by-Side Comparison {#side-by-side}
+
+```{r side-by-side-plot}
+#| fig-height: 6
+# Load precomputed side-by-side data
+side_by_side <- readRDS(
+  system.file("extdata", "hazard_mills_side_by_side.rds", package = "millsratio")
+)
+
+plot_data <- side_by_side %>%
+  pivot_longer(
+    cols = c(mills_ratio, hazard),
+    names_to = "function_type",
+    values_to = "value"
   ) %>%
   mutate(
-    # Verify they're equal
-    methods_equal = near(hazard_method1, hazard_method2)
+    function_type = ifelse(
+      function_type == "mills_ratio",
+      "Mills Ratio m(x)",
+      "Hazard h(x)"
+    )
   )
 
-# Display first few rows
-df %>%
-  head(10) %>%
-  knitr::kable(
-    digits = 4,
-    caption = "Mills Ratio vs Hazard Function"
-  )
-```
-
-### Visualize the Relationship
-
-```{r viz-relationship}
-#| fig-height: 6
-# Prepare data for plotting
-plot_data <- df %>%
-  select(x, mills_ratio, hazard = hazard_method1) %>%
-  pivot_longer(-x, names_to = "function_type", values_to = "value")
-
-# Create interactive plot
-p <- plot_data %>%
-  ggplot(aes(x, value, color = function_type)) +
-  geom_line(size = 1.2) +
-  scale_y_log10() +
+p <- ggplot(plot_data, aes(x, value, color = distribution)) +
+  geom_line(linewidth = 1.2) +
+  facet_wrap(~function_type, scales = "free_y") +
+  scale_y_log10(labels = scales::label_number()) +
+  scale_color_brewer(palette = "Set1") +
+  theme_minimal(base_size = 12) +
   labs(
-    title = "Mills Ratio and Hazard Function for Normal Distribution",
-    subtitle = "Note: h(x) = 1/m(x)",
+    title = "Mills Ratio vs Hazard Function",
+    subtitle = "h(x) = 1/m(x) for all distributions",
     x = "x",
     y = "Value (log scale)",
-    color = "Function"
+    color = "Distribution"
   ) +
-  theme_minimal() +
-  scale_color_manual(
-    values = c("mills_ratio" = "#2c3e50", "hazard" = "#e74c3c"),
-    labels = c("mills_ratio" = "Mills Ratio m(x)", "hazard" = "Hazard h(x)")
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom"
   )
 
- ggplotly(p)
+ggplotly(p)
 ```
 
-## Compare Across Distributions
+Note how the patterns are mirror images on a log scale: where the Mills ratio is large (thick tails), the hazard is small, and vice versa.
+
+## Compare Across Distributions {#compare-distributions}
 
 ```{r compare-distributions}
-# Calculate for multiple distributions
-comparison <- expand_grid(
-  x = seq(0.1, 5, by = 0.2),
-  distribution = c("Normal", "t(3)", "t(30)", "Exponential")
-) %>%
-  mutate(
-    mills_ratio = case_when(
-      distribution == "Normal" ~ mills_ratio_normal(x),
-      distribution == "t(3)" ~ mills_ratio_t(x, df = 3),
-      distribution == "t(30)" ~ mills_ratio_t(x, df = 30),
-      distribution == "Exponential" ~ mills_ratio_exp(x)
-    ),
-    hazard = 1 / mills_ratio
-  )
-
-# Plot comparison
-p_compare <- comparison %>%
+# Use precomputed side-by-side data for distribution comparison
+p_compare <- side_by_side %>%
   ggplot(aes(x, hazard, color = distribution)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   scale_y_log10() +
   facet_wrap(~distribution, scales = "free_y") +
   labs(
@@ -125,65 +120,113 @@ p_compare <- comparison %>%
 ggplotly(p_compare)
 ```
 
-## Hazard Function Properties
+## Hazard Function Properties {#hazard-properties}
 
 ```{r hazard-properties}
-# Analyze hazard behavior for each distribution
-hazard_analysis <- comparison %>%
-  group_by(distribution) %>%
-  arrange(x) %>%
-  mutate(
-    hazard_diff = hazard - lag(hazard),
-    is_increasing = hazard_diff > 0
-  ) %>%
-  summarize(
-    min_hazard = min(hazard),
-    max_hazard = max(hazard),
-    all_increasing = all(is_increasing, na.rm = TRUE),
-    all_decreasing = all(!is_increasing, na.rm = TRUE),
-    behavior = case_when(
-      all_increasing ~ "Increasing (IFR)",
-      all_decreasing ~ "Decreasing (DFR)",
-      abs(max_hazard - min_hazard) < 0.001 ~ "Constant (CFR)",
-      TRUE ~ "Non-monotonic"
-    )
-  )
+# Load precomputed hazard properties
+hazard_props <- readRDS(
+  system.file("extdata", "hazard_properties.rds", package = "millsratio")
+)
 
-hazard_analysis %>%
+hazard_props %>%
   knitr::kable(
-    digits = 4,
-    caption = "Hazard Function Properties by Distribution (IFR = Increasing Failure Rate, DFR = Decreasing, CFR = Constant)"
+    caption = paste(
+      "Hazard Function Properties by Distribution",
+      "(IFR = Increasing Failure Rate, DFR = Decreasing, CFR = Constant)"
+    )
   )
 ```
 
-## Applications
+## Hazard Crossover: t(30) Paradox {#hazard-crossover}
+
+The t(30) distribution is often treated as "approximately normal", but their hazard functions tell a different story. Despite nearly identical PDFs and CDFs, the hazard functions diverge in the tails.
+
+```{r crossover-plot}
+#| fig-height: 6
+# Load precomputed crossover data
+crossover <- readRDS(
+  system.file("extdata", "hazard_crossover_data.rds", package = "millsratio")
+)
+
+# Find approximate crossover point
+crossover_x <- crossover %>%
+  mutate(diff_sign = sign(h_t30 - h_normal)) %>%
+  mutate(sign_change = diff_sign != lag(diff_sign)) %>%
+  filter(sign_change) %>%
+  pull(x) %>%
+  first()
+
+p_cross <- ggplot(crossover, aes(x = x)) +
+  geom_line(aes(y = h_normal, color = "Normal"), linewidth = 1.2) +
+  geom_line(aes(y = h_t30, color = "t(30)"), linewidth = 1.2) +
+  scale_color_manual(
+    values = c("Normal" = "#1f77b4", "t(30)" = "#ff7f0e"),
+    name = "Distribution"
+  ) +
+  scale_y_log10() +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Hazard Function Crossover: Normal vs t(30)",
+    subtitle = sprintf("Crossover near x = %.1f", crossover_x),
+    x = "x",
+    y = "Hazard h(x) (log scale)"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom"
+  )
+
+if (!is.na(crossover_x)) {
+  p_cross <- p_cross +
+    geom_vline(xintercept = crossover_x, linetype = "dashed", alpha = 0.5) +
+    annotate("text", x = crossover_x + 0.3, y = 1, label = "Crossover",
+             size = 3, alpha = 0.7)
+}
+
+ggplotly(p_cross)
+```
+
+```{r crossover-ratio}
+#| fig-height: 4
+# Ratio of hazard functions
+p_ratio <- ggplot(crossover, aes(x = x, y = ratio)) +
+  geom_line(linewidth = 1.2, color = "#2ca02c") +
+  geom_hline(yintercept = 1, linetype = "dashed", alpha = 0.5) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Hazard Ratio: h_t30(x) / h_normal(x)",
+    subtitle = "Values > 1 mean t(30) has higher hazard than normal",
+    x = "x",
+    y = "Hazard ratio"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+ggplotly(p_ratio)
+```
+
+For small $x$, the t(30) hazard exceeds the normal hazard (ratio > 1). In the tails, the normal hazard grows without bound while the t(30) hazard eventually decreases---a direct consequence of the heavier tails of the t-distribution.
+
+## Applications {#applications}
 
 ### Survival Analysis Example
 
 ```{r survival-example}
-# Simulate survival times
-set.seed(123)
-survival_data <- tibble(
-  time = seq(0.1, 10, by = 0.1)
-) %>%
+# Compute survival curves from hazard functions
+x_grid <- seq(0.1, 10, by = 0.1)
+survival_data <- tibble(time = x_grid) %>%
   mutate(
-    # Different hazard patterns
     constant_hazard = hazard_function(time, "exponential", rate = 0.5),
     increasing_hazard = hazard_function(time, "normal", mean = 5, sd = 2),
-
-    # Convert to survival probabilities
-    # S(t) = exp(-integral of hazard)
     survival_constant = exp(-cumsum(constant_hazard * 0.1)),
     survival_increasing = exp(-cumsum(increasing_hazard * 0.1))
   )
 
-# Plot survival curves
 p_survival <- survival_data %>%
   select(time, starts_with("survival")) %>%
   pivot_longer(-time, names_to = "type", values_to = "probability") %>%
-  mutate(type = str_remove(type, "survival_")) %>%
+  mutate(type = gsub("survival_", "", type)) %>%
   ggplot(aes(time, probability, color = type)) +
-  geom_line(size = 1.2) +
+  geom_line(linewidth = 1.2) +
   labs(
     title = "Survival Curves from Different Hazard Functions",
     x = "Time",
@@ -195,42 +238,7 @@ p_survival <- survival_data %>%
 ggplotly(p_survival)
 ```
 
-### Reliability Engineering
-
-```{r reliability}
-# Component lifetime analysis
-reliability_data <- tibble(
-  hours = seq(100, 10000, by = 100)
-) %>%
-  mutate(
-    # Normal wear-out (increasing hazard)
-    wear_out_hazard = hazard_function(hours/1000, "normal", mean = 5, sd = 1.5),
-
-    # Random failure (constant hazard)
-    random_hazard = rep(0.0001, n()),
-
-    # Combined hazard (competing risks)
-    total_hazard = wear_out_hazard + random_hazard,
-
-    # Reliability function R(t) = exp(-integral of hazard)
-    reliability = exp(-cumsum(total_hazard * 100))
-  )
-
-# Display summary statistics
-reliability_summary <- reliability_data %>%
-  summarize(
-    median_life = hours[which.min(abs(reliability - 0.5))],
-    `10%_life` = hours[which.min(abs(reliability - 0.9))],
-    `1%_life` = hours[which.min(abs(reliability - 0.99))]
-  )
-
-reliability_summary %>%
-  knitr::kable(
-    caption = "Component Life Estimates from Hazard Model"
-  )
-```
-
-## Key Insights
+## Key Insights {#key-insights}
 
 1. **Reciprocal Relationship**: The hazard function is always the reciprocal of the Mills ratio: $h(x) = 1/m(x)$
 
@@ -244,49 +252,34 @@ reliability_summary %>%
    - Use hazard function for time-to-event modeling
    - Both provide insights into extreme event behavior
 
-## Code Examples
+## Code Examples {#code-examples}
 
 ### Pipeline for Analysis
 
 ```{r pipeline-example}
-# Complete analysis pipeline
-analysis_pipeline <- function(x_range, distributions) {
-  expand_grid(
-    x = x_range,
-    distribution = distributions
+# Complete analysis pipeline using package functions
+results <- tibble(
+  distribution = c("Normal", "t(30)", "Exponential")
+) %>%
+  mutate(
+    props = lapply(
+      c("normal", "t", "exponential"),
+      function(d) {
+        if (d == "t") hazard_properties(d, df = 30)
+        else hazard_properties(d)
+      }
+    ),
+    behavior = sapply(props, `[[`, "behavior"),
+    asymptotic = sapply(props, `[[`, "asymptotic_behavior"),
+    interpretation = sapply(props, `[[`, "interpretation")
   ) %>%
-    mutate(
-      mills = case_when(
-        distribution == "Normal" ~ mills_ratio_normal(x),
-        distribution == "t(30)" ~ mills_ratio_t(x, df = 30),
-        distribution == "Exponential" ~ mills_ratio_exp(x),
-        TRUE ~ NA_real_
-      ),
-      hazard = 1 / mills
-    ) %>%
-    group_by(distribution) %>%
-    summarize(
-      avg_mills = mean(mills),
-      avg_hazard = mean(hazard),
-      mills_cv = sd(mills) / mean(mills),
-      hazard_trend = cor(x, hazard)
-    )
-}
-
-# Run analysis
-results <- analysis_pipeline(
-  x_range = seq(0.5, 5, by = 0.1),
-  distributions = c("Normal", "t(30)", "Exponential")
-)
+  select(-props)
 
 results %>%
-  knitr::kable(
-    digits = 3,
-    caption = "Distribution Comparison Summary"
-  )
+  knitr::kable(caption = "Distribution Comparison Summary")
 ```
 
-## Conclusion
+## Conclusion {#conclusion}
 
 The Mills ratio and hazard function provide complementary views of the same underlying phenomenon. Understanding their relationship enables:
 

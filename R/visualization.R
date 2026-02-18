@@ -364,3 +364,86 @@ plot_mills_comparison <- function(x_range = c(0, 5),
 
   return(p)
 }
+
+#' Plot Mills Ratio vs Hazard Function Side-by-Side
+#'
+#' @param x_range Numeric vector of length 2 giving the range of x values
+#' @param distributions Character vector of distribution names
+#'   (e.g., c("normal", "t30", "exponential"))
+#' @param n_points Number of points to compute (default 200)
+#' @param interactive Logical; if TRUE, returns plotly object
+#' @param log_y Logical; if TRUE, uses log scale for y-axis
+#'
+#' @return ggplot2 or plotly object with faceted m(x) and h(x) panels
+#' @export
+#'
+#' @examples
+#' plot_mills_vs_hazard()
+#' plot_mills_vs_hazard(x_range = c(0.5, 8), distributions = c("normal", "t30"))
+plot_mills_vs_hazard <- function(x_range = c(0.1, 5),
+                                 distributions = c("normal", "t30", "exponential"),
+                                 n_points = 200,
+                                 interactive = FALSE,
+                                 log_y = TRUE) {
+
+  x_vals <- seq(x_range[1], x_range[2], length.out = n_points)
+
+  # Build data for each distribution using compare_mills_hazard
+  data_list <- lapply(distributions, function(dist) {
+    if (grepl("^t\\d+$", dist)) {
+      df_val <- as.numeric(sub("^t", "", dist))
+      result <- compare_mills_hazard(x_vals, "t", df = df_val)
+      result$distribution <- paste0("t(", df_val, ")")
+    } else {
+      result <- compare_mills_hazard(x_vals, dist)
+      result$distribution <- switch(dist,
+        normal = "Normal",
+        exponential = "Exponential",
+        dist
+      )
+    }
+    result
+  })
+  data_wide <- do.call(rbind, data_list)
+
+  # Pivot to long for faceting
+  data_long <- tidyr::pivot_longer(
+    data_wide,
+    cols = c("mills_ratio", "hazard"),
+    names_to = "function_type",
+    values_to = "value"
+  )
+  data_long$function_type <- ifelse(
+    data_long$function_type == "mills_ratio",
+    "Mills Ratio m(x)",
+    "Hazard h(x)"
+  )
+
+  p <- ggplot2::ggplot(data_long,
+    ggplot2::aes(x = x, y = value, color = distribution)) +
+    ggplot2::geom_line(linewidth = 1.2) +
+    ggplot2::facet_wrap(~function_type, scales = "free_y") +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::labs(
+      title = "Mills Ratio vs Hazard Function",
+      subtitle = "h(x) = 1/m(x) for all distributions",
+      x = "x",
+      y = "Value",
+      color = "Distribution"
+    ) +
+    ggplot2::scale_color_brewer(palette = "Set1") +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"),
+      legend.position = "bottom"
+    )
+
+  if (log_y) {
+    p <- p + ggplot2::scale_y_log10(labels = scales::label_number())
+  }
+
+  if (interactive) {
+    return(plotly::ggplotly(p, tooltip = c("x", "y", "colour")))
+  }
+
+  return(p)
+}
