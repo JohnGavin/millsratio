@@ -56,11 +56,11 @@ cat(" - rwasm (r-wasm/rwasm)\n")
 
 # Generate default.nix
 rix(
-  r_ver = "4.5.2",
+  date = "2026-01-05",
   r_pkgs = r_packages,
   git_pkgs = gh_pkgs,
   system_pkgs = NULL,  # No extra system packages needed
-  ide = "rstudio",
+  ide = "none",  # NEVER use "rstudio" in project-specific shells - dev shell provides IDE
   project_path = ".",
   overwrite = TRUE
 )

@@ -1,6 +1,6 @@
 Package: millsratio
 Title: Interactive Analysis of Mills Ratios and Tail Thickness
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person("John", "Gavin", , "john.b.gavin@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
@@ -27,7 +27,10 @@ Suggests:
     rmarkdown,
     scales,
     shinylive,
+    tarchetypes,
+    targets,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/Needs/website: pkgdown
 URL: https://johngavin.github.io/millsratio/, https://github.com/JohnGavin/millsratio
 BugReports: https://github.com/JohnGavin/millsratio/issues
