@@ -107,6 +107,8 @@ documentation_plan <- list(
 
       # Check if _quarto.yml exists
       if(file.exists("_quarto.yml") && requireNamespace("quarto", quietly = TRUE)) {
+        # Load package so vignettes can call library(millsratio)
+        pkgload::load_all(export_all = FALSE, quiet = TRUE)
         quarto::quarto_render()
         "docs/index.html"
       } else {
@@ -125,15 +127,14 @@ documentation_plan <- list(
       vignette_files
       r_files
 
-      # Generate structure using fs
+      # Generate structure using fs - FIXED: removed max_depth argument
       if(requireNamespace("fs", quietly = TRUE)) {
         structure_text <- capture.output(
           fs::dir_tree(
             path = ".",
-            recurse = TRUE,
+            recurse = 2,  # Use recurse with numeric depth instead
             type = "any",
-            regexp = "^[^._]",  # Exclude hidden and _ prefixed
-            max_depth = 3
+            regexp = "^[^._]"  # Exclude hidden and _ prefixed
           )
         )
 

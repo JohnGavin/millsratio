@@ -1,3 +1,12 @@
+# Suppress R CMD check notes for dplyr/ggplot2 bare column names
+utils::globalVariables(c(
+
+  "x", "y", "value", "mills_ratio", "distribution", "type",
+  "mills_normal", "mills_t30", "pdf_normal", "pdf_t30",
+  "cdf_normal", "cdf_t30", "dist", "function_type", "metric",
+  "panel", "tail_type"
+))
+
 #' Visualization Functions for Mills Ratio Analysis
 #'
 #' @description
