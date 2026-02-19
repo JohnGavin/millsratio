@@ -1,6 +1,6 @@
 Package: millsratio
 Title: Interactive Analysis of Mills Ratios and Tail Thickness
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person("John", "Gavin", , "john.b.gavin@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
@@ -8,28 +8,29 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Imports: 
-    bslib,
+Imports:
     dplyr,
-    DT,
     ggplot2,
     plotly,
-    purrr,
+    scales,
     shiny,
     stats,
     tidyr
 Suggests:
+    bslib,
     covr,
+    DT,
     gt,
     htmlwidgets,
     knitr,
+    purrr,
     quarto,
     rmarkdown,
-    scales,
     shinylive,
     tarchetypes,
     targets,
     testthat (>= 3.0.0)
+VignetteBuilder: quarto
 Config/testthat/edition: 3
 Config/Needs/website: pkgdown
 URL: https://johngavin.github.io/millsratio/, https://github.com/JohnGavin/millsratio
