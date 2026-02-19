@@ -1,8 +1,8 @@
 Package: millsratio
-Version: 0.2.1
-Imports: bslib, dplyr, DT, ggplot2, plotly, purrr, shiny, stats, tidyr
-Suggests: covr, gt, htmlwidgets, knitr, quarto, rmarkdown, scales,
-        shinylive, tarchetypes, targets, testthat (>= 3.0.0)
+Version: 0.2.2
+Imports: dplyr, ggplot2, plotly, scales, shiny, stats, tidyr
+Suggests: bslib, covr, DT, gt, htmlwidgets, knitr, purrr, quarto,
+        rmarkdown, shinylive, tarchetypes, targets, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: 50e3279a8c9a725353ee924189b3906a
+MD5sum: 1321eaa45b3fbaf759be4d8aafcee698
 NeedsCompilation: no
