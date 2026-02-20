@@ -7,65 +7,95 @@ library(plotly)
 library(DT)
 
 ui <- page_navbar(
+  id = "main_nav",
   title = "Mills Ratio Explorer",
   theme = bs_theme(
     version = 5,
-    bootswatch = "flatly",
-    primary = "#2c3e50",
-    success = "#18bc9c"
+    bootswatch = "cosmo",
+    "body-color" = "#212529",
+    "headings-color" = "#212529"
   ),
+
+  # Custom CSS for high contrast and scrolling
+
+  header = tags$head(tags$style(HTML("
+    /* High-contrast buttons - dark text on colored backgrounds */
+    .btn-primary { background-color: #0d6efd; color: #fff; border-color: #0d6efd; }
+    .btn-secondary { background-color: #6c757d; color: #fff; border-color: #6c757d; }
+    .btn-success { background-color: #198754; color: #fff; border-color: #198754; }
+    .btn-info { background-color: #0dcaf0; color: #000; border-color: #0dcaf0; }
+    .btn-warning { background-color: #ffc107; color: #000; border-color: #ffc107; }
+    .btn-danger { background-color: #dc3545; color: #fff; border-color: #dc3545; }
+
+    /* Ensure all card headers have readable text */
+    .card-header { background-color: #f8f9fa; color: #212529; font-weight: 600; }
+
+    /* Alert boxes - ensure readable text */
+    .alert-info { background-color: #cff4fc; color: #055160; border-color: #b6effb; }
+    .alert-success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+    .alert-warning { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
+    .alert-danger { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
+
+    /* Ensure all text is readable */
+    .text-muted { color: #6c757d !important; }
+    p, li, span, div, label { color: #212529; }
+    h1, h2, h3, h4, h5, h6 { color: #212529; }
+
+    /* Page sections explanatory text */
+    .page-explanation {
+      background-color: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      color: #212529;
+    }
+
+    /* Scrollable page content */
+    .tab-pane { overflow-y: auto; max-height: calc(100vh - 80px); padding-bottom: 20px; }
+
+    /* Make plotly outputs respect container */
+    .plotly { width: 100% !important; }
+  "))),
 
   # Page 1: Welcome & Overview
   nav_panel(
     title = "Welcome",
-    icon = icon("home"),
     layout_columns(
       col_widths = c(12),
       card(
-        card_header("Welcome to Mills Ratio Explorer"),
+        card_header("Mills Ratio Explorer"),
         card_body(
-          h3("Understanding Tail Thickness Through Mills Ratios"),
-          br(),
-          p("The Mills ratio m(x) = [1 - F(x)] / f(x) reveals fundamental differences
-            between distribution tails that are invisible in the center."),
-          br(),
-          layout_columns(
-            col_widths = c(4, 4, 4),
-            card(
-              card_header(class = "bg-primary text-white", "Explore"),
-              card_body(
-                icon("chart-line", class = "fa-3x text-primary"),
-                br(), br(),
-                p("Interactive visualizations of Mills ratios across distributions"),
-                actionButton("go_to_normal", "Start Exploring", class = "btn-primary")
-              )
-            ),
-            card(
-              card_header(class = "bg-info text-white", "Learn"),
-              card_body(
-                icon("graduation-cap", class = "fa-3x text-info"),
-                br(), br(),
-                p("Mathematical foundations and asymptotic analysis"),
-                actionButton("go_to_theory", "View Theory", class = "btn-info")
-              )
-            ),
-            card(
-              card_header(class = "bg-success text-white", "Create"),
-              card_body(
-                icon("code", class = "fa-3x text-success"),
-                br(), br(),
-                p("Build your own Mills ratio experiments"),
-                actionButton("go_to_playground", "Open Playground", class = "btn-success")
-              )
-            )
+          div(class = "page-explanation",
+            p(strong("What is this dashboard?"),
+              "This tool lets you explore Mills ratios interactively across
+              different probability distributions. The Mills ratio m(x) = [1 - F(x)] / f(x)
+              reveals fundamental differences between distribution tails that are invisible
+              in the center of the distribution."),
+            p("Use the navigation bar above to explore different pages. Each page
+              focuses on a different aspect of Mills ratios.")
+          ),
+          h4("Navigate to:"),
+          tags$ul(
+            tags$li(strong("Analysis"), " - Interactive plots comparing distributions.
+                    Adjust sliders and checkboxes to see how Mills ratios change."),
+            tags$li(strong("Theory"), " - Mathematical definitions with interactive
+                    calculators. Move the slider to compute Mills ratio, hazard function,
+                    and survival function at any x value."),
+            tags$li(strong("Playground"), " - Write and run your own R code for custom
+                    Mills ratio experiments.")
           ),
           br(),
+          actionButton("go_to_normal", "Start Exploring (Analysis)", class = "btn-primary btn-lg"),
+          actionButton("go_to_theory", "View Theory", class = "btn-secondary btn-lg"),
+          actionButton("go_to_playground", "Open Playground", class = "btn-secondary btn-lg"),
+          br(), br(),
           card(
             card_header("Key Finding: The t(30) Paradox"),
             card_body(
-              plotlyOutput("welcome_plot", height = "300px"),
-              p(class = "text-muted mt-2",
-                "t(30) appears nearly identical to normal in the center but diverges dramatically in the tails")
+              p("The t(30) distribution looks nearly identical to the normal distribution
+                in the center, but their Mills ratios diverge dramatically in the tails.
+                This has important implications for risk modeling."),
+              plotlyOutput("welcome_plot", height = "300px")
             )
           )
         )
@@ -76,7 +106,6 @@ ui <- page_navbar(
   # ANALYSIS SECTION
   nav_menu(
     title = "Analysis",
-    icon = icon("chart-bar"),
 
     # Page 2: Normal Distribution Explorer
     nav_panel(
@@ -86,7 +115,13 @@ ui <- page_navbar(
         card(
           card_header("Normal Distribution Mills Ratio"),
           card_body(
-            plotlyOutput("normal_mills_plot", height = "500px")
+            div(class = "page-explanation",
+              p("This plot shows the exact Mills ratio for the normal distribution.
+                Use the controls on the right to adjust the x range,
+                toggle the asymptotic approximation (1/x), and switch to log scales.
+                Hover over the plot for exact values.")
+            ),
+            plotlyOutput("normal_mills_plot", height = "450px")
           )
         ),
         card(
@@ -100,10 +135,11 @@ ui <- page_navbar(
             checkboxInput("normal_log_x", "Log X Scale", FALSE),
             br(),
             h5("Key Insight"),
-            p(class = "text-info",
-              "Normal distribution has thin tails: Mills ratio decreases as ~1/x"),
+            p("The normal distribution has ", strong("thin tails"), ": its Mills ratio
+              decreases as approximately 1/x for large x. This means the tail probability
+              falls off very quickly relative to the density."),
             br(),
-            div(id = "normal_value_box", class = "alert alert-info")
+            uiOutput("normal_value_box")
           )
         )
       )
@@ -117,7 +153,12 @@ ui <- page_navbar(
         card(
           card_header("Student's t Distribution Mills Ratios"),
           card_body(
-            plotlyOutput("t_mills_plot", height = "500px")
+            div(class = "page-explanation",
+              p("Compare Mills ratios for t-distributions with different degrees of freedom.
+                Use the slider to change df. Check boxes below to overlay comparison
+                distributions. The dashed line shows the asymptotic approximation x/df.")
+            ),
+            plotlyOutput("t_mills_plot", height = "450px")
           )
         ),
         card(
@@ -126,6 +167,7 @@ ui <- page_navbar(
             sliderInput("t_df_slider", "Degrees of Freedom:",
                        min = 1, max = 100, value = 30, step = 1,
                        animate = animationOptions(interval = 100)),
+            p(class = "text-muted", "Drag the slider or click the play button to animate."),
             br(),
             checkboxGroupInput("t_df_compare", "Compare with:",
                              choices = c("df=3" = "3", "df=10" = "10",
@@ -135,18 +177,25 @@ ui <- page_navbar(
             checkboxInput("t_show_asymptotic", "Show Asymptotic (x/df)", TRUE),
             br(),
             h5("Key Insight"),
-            p(class = "text-info",
-              "t-distribution has fat tails: Mills ratio increases as ~x/df"),
+            p("The t-distribution has ", strong("fat tails"), ": its Mills ratio
+              increases as approximately x/df. Lower df means fatter tails and faster
+              Mills ratio growth."),
             br(),
-            div(id = "t_value_box", class = "alert alert-info")
+            uiOutput("t_value_box")
           )
         )
       )
     ),
 
-    # Page 4: Distribution Battle Arena
+    # Page 4: Distribution Comparison
     nav_panel(
       title = "Distribution Comparison",
+      div(class = "page-explanation",
+        p("Compare Mills ratios across multiple distributions simultaneously.
+          The left plot shows the raw Mills ratios. The right plot shows the ratio
+          relative to the baseline distribution. Use the controls below to select
+          which distributions to compare and adjust the x range.")
+      ),
       layout_columns(
         col_widths = c(6, 6),
         card(
@@ -197,12 +246,20 @@ ui <- page_navbar(
         card(
           card_header("Mills Ratio Heatmap"),
           card_body(
-            plotlyOutput("thickness_heatmap", height = "500px")
+            div(class = "page-explanation",
+              p("The heatmap shows log10(Mills ratio) across distributions and x values.
+                Red/warm colors = higher Mills ratio (fatter tails).
+                Blue/cool colors = lower Mills ratio (thinner tails).
+                Hover over cells for exact values.")
+            ),
+            plotlyOutput("thickness_heatmap", height = "450px")
           )
         ),
         card(
           card_header("Point Analysis"),
           card_body(
+            p("Adjust the slider to select the x value range for the table below.
+              The table shows exact Mills ratios and ratios relative to the normal distribution."),
             sliderInput("thickness_x_points", "X Values:",
                        min = 0, max = 10, value = c(1, 5), step = 0.5),
             br(),
@@ -218,10 +275,16 @@ ui <- page_navbar(
     # Page 6: t(30) Paradox
     nav_panel(
       title = "t(30) Paradox",
+      div(class = "page-explanation",
+        p(strong("The t(30) Paradox: "), "The t(30) distribution is often called
+          'practically normal', but their tails tell a very different story.
+          Click the tabs below to see the comparison from different angles.
+          Use the slider to focus on a specific x value and see the divergence.")
+      ),
       layout_columns(
         col_widths = c(12),
         card(
-          card_header("The t(30) Paradox: Similar Centers, Different Tails"),
+          card_header("Comparing t(30) and Normal"),
           card_body(
             tabsetPanel(
               tabPanel("Mills Ratio",
@@ -241,13 +304,16 @@ ui <- page_navbar(
         card(
           card_header("Analysis Controls"),
           card_body(
+            p("Drag the slider to move the vertical focus line on the Mills Ratio plot.
+              The boxes below update to show how similar the distributions are (CDF difference)
+              vs how different their Mills ratios are at that x value."),
             layout_columns(
               col_widths = c(4, 4, 4),
               sliderInput("paradox_x_focus", "Focus on X:",
                          min = 0, max = 10, value = 3, step = 0.1,
                          animate = TRUE),
-              div(id = "paradox_similarity", class = "alert alert-success"),
-              div(id = "paradox_divergence", class = "alert alert-warning")
+              uiOutput("paradox_similarity"),
+              uiOutput("paradox_divergence")
             )
           )
         )
@@ -258,11 +324,16 @@ ui <- page_navbar(
   # THEORY SECTION
   nav_menu(
     title = "Theory",
-    icon = icon("book"),
 
-    # Page 7: Living Definitions
+    # Page 7: Definitions
     nav_panel(
       title = "Definitions",
+      div(class = "page-explanation",
+        p("Interactive mathematical definitions. Use the ", strong("Distribution"),
+          " dropdown and ", strong("x value"), " slider on the left card to change the
+          distribution and point. All three cards update simultaneously to show the
+          Mills ratio, hazard function, and survival function at your chosen x value.")
+      ),
       layout_columns(
         col_widths = c(4, 4, 4),
         card(
@@ -270,11 +341,13 @@ ui <- page_navbar(
           card_body(
             withMathJax(),
             p("$$m(x) = \\frac{1 - F(x)}{f(x)} = \\frac{\\bar{F}(x)}{f(x)}$$"),
-            br(),
+            p("The ratio of the survival function to the density. It measures
+              how much probability remains in the tail relative to the density at x."),
             selectInput("def_mills_dist", "Distribution:",
                        choices = c("Normal", "t(df)", "Exponential")),
             sliderInput("def_mills_x", "x value:", 0, 5, 2, step = 0.1),
-            textOutput("def_mills_value"),
+            p(class = "text-muted", "Drag the slider to see values change in all three cards."),
+            strong(textOutput("def_mills_value")),
             plotlyOutput("def_mills_plot", height = "200px")
           )
         ),
@@ -282,9 +355,9 @@ ui <- page_navbar(
           card_header("Hazard Function"),
           card_body(
             p("$$h(x) = \\frac{f(x)}{1 - F(x)} = \\frac{1}{m(x)}$$"),
-            br(),
-            p("The hazard function is the reciprocal of the Mills ratio."),
-            textOutput("def_hazard_value"),
+            p("The reciprocal of the Mills ratio. It gives the instantaneous
+              failure rate at x given survival to x. Higher hazard = thinner tails."),
+            strong(textOutput("def_hazard_value")),
             plotlyOutput("def_hazard_plot", height = "200px")
           )
         ),
@@ -292,16 +365,16 @@ ui <- page_navbar(
           card_header("Survival Function"),
           card_body(
             p("$$S(x) = 1 - F(x) = \\bar{F}(x)$$"),
-            br(),
-            p("The survival function appears in the Mills ratio numerator."),
-            textOutput("def_survival_value"),
+            p("The probability of exceeding x. This is the numerator of the Mills ratio.
+              Fat-tailed distributions have higher survival for large x."),
+            strong(textOutput("def_survival_value")),
             plotlyOutput("def_survival_plot", height = "200px")
           )
         )
       )
     ),
 
-    # Page 8: Asymptotic Playground
+    # Page 8: Asymptotics
     nav_panel(
       title = "Asymptotics",
       layout_columns(
@@ -309,7 +382,13 @@ ui <- page_navbar(
         card(
           card_header("Asymptotic Approximation Accuracy"),
           card_body(
-            plotlyOutput("asymptotic_plot", height = "500px"),
+            div(class = "page-explanation",
+              p("This plot compares the exact Mills ratio (solid line) with its
+                asymptotic approximation (dashed line). Use the dropdown on the right
+                to choose a distribution and the slider to adjust the x range.
+                The table below shows the approximation error at selected points.")
+            ),
+            plotlyOutput("asymptotic_plot", height = "400px"),
             br(),
             DTOutput("asymptotic_table", height = "200px")
           )
@@ -322,18 +401,19 @@ ui <- page_navbar(
                                  "t(3)" = "t3",
                                  "t(10)" = "t10",
                                  "t(30)" = "t30")),
+            p(class = "text-muted", "Select a distribution to see its approximation accuracy."),
             br(),
             sliderInput("asymp_x_range", "X Range:",
                        min = 1, max = 20, value = c(2, 10)),
             br(),
             h5("Asymptotic Formulas"),
             tags$ul(
-              tags$li("Normal: m(x) ~ 1/x"),
-              tags$li("t(df): m(x) ~ x/df"),
-              tags$li("Exponential: m(x) = 1/rate")
+              tags$li(strong("Normal:"), " m(x) ~ 1/x as x grows large"),
+              tags$li(strong("t(df):"), " m(x) ~ x/df as x grows large"),
+              tags$li(strong("Exponential:"), " m(x) = 1/rate (constant, exact)")
             ),
             br(),
-            div(id = "asymp_error_box", class = "alert alert-warning")
+            uiOutput("asymp_error_box")
           )
         )
       )
@@ -343,11 +423,16 @@ ui <- page_navbar(
   # PLAYGROUND SECTION
   nav_menu(
     title = "Playground",
-    icon = icon("flask"),
 
-    # Page 11: Build Your Own
+    # Page 9: Custom Analysis
     nav_panel(
       title = "Custom Analysis",
+      div(class = "page-explanation",
+        p("Write R code in the left panel and click ", strong("Run Code"),
+          " to execute it. The plot output appears on the right. You can use any
+          millsratio package function (e.g., mills_ratio_normal, mills_ratio_t,
+          simulate_mills_curves, plot_mills_curves). Text output appears below the plot.")
+      ),
       layout_columns(
         col_widths = c(6, 6),
         card(
@@ -359,7 +444,7 @@ ui <- page_navbar(
                          width = "100%",
                          value = "# Example: Custom Mills ratio analysis\nx <- seq(0, 5, by = 0.1)\nm_normal <- mills_ratio_normal(x)\nm_t30 <- mills_ratio_t(x, df = 30)\n\nplot(x, m_normal, type = 'l', col = 'blue',\n     ylab = 'Mills Ratio', main = 'Custom Comparison')\nlines(x, m_t30, col = 'red')\nlegend('topright', c('Normal', 't(30)'), \n       col = c('blue', 'red'), lty = 1)"),
             br(),
-            actionButton("run_custom", "Run Code", class = "btn-success"),
+            actionButton("run_custom", "Run Code", class = "btn-primary btn-lg"),
             downloadButton("download_code", "Download Script", class = "btn-secondary")
           )
         ),
@@ -373,9 +458,14 @@ ui <- page_navbar(
       )
     ),
 
-    # Page 12: Quick Reference
+    # Page 10: Quick Reference
     nav_panel(
       title = "Reference",
+      div(class = "page-explanation",
+        p("Quick reference for all millsratio package functions and formulas.
+          Select a code template from the dropdown at the bottom to see example R code
+          you can copy into the Custom Analysis playground.")
+      ),
       layout_columns(
         col_widths = c(12),
         card(
@@ -401,11 +491,13 @@ ui <- page_navbar(
                                      "Comparison Plot" = "compare",
                                      "Asymptotic Analysis" = "asymptotic",
                                      "Monte Carlo Verification" = "monte_carlo")),
+                p(class = "text-muted",
+                  "Select a template above to see the code. Copy it to the Custom Analysis page to run it."),
                 br(),
                 verbatimTextOutput("template_code"),
                 br(),
-                actionButton("copy_template", "Copy to Clipboard",
-                           class = "btn-secondary")
+                actionButton("use_template", "Copy to Custom Analysis",
+                           class = "btn-primary")
               )
             )
           )
@@ -417,31 +509,34 @@ ui <- page_navbar(
   # About page
   nav_panel(
     title = "About",
-    icon = icon("info-circle"),
     card(
       card_header("About This Dashboard"),
       card_body(
         h4("Mills Ratio Interactive Explorer"),
-        p("Version:", as.character(utils::packageVersion("millsratio"))),
+        p("Version: ", as.character(utils::packageVersion("millsratio"))),
         br(),
-        p("This dashboard implements and extends the concepts from John D. Cook's blog post on Mills ratios and tail thickness."),
+        p("This dashboard implements and extends the concepts from John D. Cook's blog
+          post on Mills ratios and tail thickness. It provides interactive visualizations
+          for exploring how different probability distributions behave in their tails."),
+        br(),
+        h5("How to Use This Dashboard"),
+        tags$ul(
+          tags$li(strong("Analysis pages"), " - Adjust sliders and checkboxes to change
+                  plots in real time. Hover over plots for exact values."),
+          tags$li(strong("Theory pages"), " - Interactive calculators for Mills ratio,
+                  hazard function, and survival function. Change the distribution and x
+                  value to see all three update."),
+          tags$li(strong("Playground"), " - Write and execute custom R code.
+                  The Reference page has templates you can copy.")
+        ),
         br(),
         p("Reference: ",
-          a("Mills Ratio and Tail Thickness",
+          a("Mills Ratio and Tail Thickness (John D. Cook)",
             href = "https://www.johndcook.com/blog/2026/01/21/mills-ratio/",
             target = "_blank")),
         br(),
         p("Created by: John Gavin"),
-        p("Implementation support: Claude Assistant"),
-        br(),
-        h5("Key Features:"),
-        tags$ul(
-          tags$li("Interactive exploration of Mills ratios"),
-          tags$li("Comparison across multiple distributions"),
-          tags$li("Asymptotic analysis and verification"),
-          tags$li("The t(30) paradox visualization"),
-          tags$li("Custom code playground")
-        )
+        p("Implementation support: Claude Assistant")
       )
     )
   ),
@@ -450,8 +545,8 @@ ui <- page_navbar(
   nav_spacer(),
   nav_item(
     tags$a(
-      icon("github"),
-      href = "https://github.com/yourusername/millsratio",
+      "GitHub",
+      href = "https://github.com/JohnGavin/millsratio",
       target = "_blank"
     )
   )
