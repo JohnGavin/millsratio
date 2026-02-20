@@ -6,6 +6,9 @@ date: today
 format:
   html:
     code-fold: true
+    code-summary: "Show code"
+    output-fold: true
+    output-summary: "Show output"
     code-tools: true
     toc: true
 engine: knitr

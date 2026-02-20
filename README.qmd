@@ -69,7 +69,7 @@ chmod +x default.sh
 
 # Now in Nix shell, R has all dependencies
 R
-> library(millsratio)
+library(millsratio)
 ```
 
 ### Using with rix
@@ -79,16 +79,16 @@ For integration with existing R projects:
 ```r
 library(rix)
 rix(
-  r_ver = "4.5.0",
-  r_pkgs = c("tidyverse", "plotly", "shiny"),
+  date = "2026-01-05",
+  r_pkgs = c("dplyr", "ggplot2", "plotly", "scales", "shiny", "tidyr"),
   git_pkgs = list(
-    millsratio = list(
-      package_source = "github",
-      repo_url = "JohnGavin/millsratio",
-      branch = "main"
+    list(
+      package_name = "millsratio",
+      repo_url = "https://github.com/JohnGavin/millsratio",
+      commit = "04d90e3cfd04585164a244fd9e07754addef46d5"
     )
   ),
-  ide = "code",
+  ide = "none",
   project_path = "."
 )
 # Then: nix-shell
@@ -262,13 +262,13 @@ cat("Relative error:", round(mc_result$relative_error, 4), "\n")
 Run the test suite:
 
 ```r
-devtools::test()
-```
+library(millsratio)
 
-Check package:
-
-```r
-devtools::check()
+# For development (if devtools available):
+if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::test()
+  devtools::check()
+}
 ```
 
 ## Reproducible Pipeline
@@ -333,6 +333,6 @@ If you use this package in your research, please cite:
   author = {Gavin, John},
   title = {millsratio: Interactive Analysis of Mills Ratios and Tail Thickness},
   year = {2026},
-  url = {https://github.com/yourusername/millsratio}
+  url = {https://github.com/JohnGavin/millsratio}
 }
 ```

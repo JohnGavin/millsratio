@@ -6,9 +6,14 @@ library(tarchetypes)
 
 # Set options
 tar_option_set(
-  packages = c("millsratio", "ggplot2", "dplyr", "tidyr", "plotly"),
+  packages = c("ggplot2", "dplyr", "tidyr", "plotly"),  # Removed millsratio
   format = "rds"
 )
+
+# Source functions (exclude R/dev/ and R/tar_plans/)
+for (file in list.files("R", pattern = "\\.R$", full.names = TRUE)) {
+  if (!grepl("R/(dev|tar_plans)/", file)) source(file)
+}
 
 # Source modular plans
 tar_source("R/tar_plans")
@@ -21,6 +26,7 @@ list(
   
   plan_mills_simulation,
   plan_hazard_analysis,
+  plan_doc_examples,
   documentation_plan,
   
   #============================================================================
