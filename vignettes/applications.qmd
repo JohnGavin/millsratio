@@ -8,6 +8,8 @@ format:
     code-fold: true
     code-summary: "Show code"
     code-tools: true
+    output-fold: true
+    output-summary: "Show output"
     toc: true
 bibliography: ../references.bib
 ---
@@ -18,6 +20,11 @@ bibliography: ../references.bib
 library(millsratio)
 library(tidyverse)
 library(plotly)
+
+# Load precomputed data from targets pipeline
+mills_data <- readRDS(system.file("extdata", "mills_data.rds", package = "millsratio"))
+mills_summary <- readRDS(system.file("extdata", "mills_summary.rds", package = "millsratio"))
+t30_paradox <- readRDS(system.file("extdata", "t30_paradox_analysis.rds", package = "millsratio"))
 ```
 
 ## Overview

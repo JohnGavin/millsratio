@@ -8,6 +8,8 @@ format:
     code-fold: true
     code-summary: "Show code"
     code-tools: true
+    output-fold: true
+    output-summary: "Show output"
     toc: true
 bibliography: ../references.bib
 ---

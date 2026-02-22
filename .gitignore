@@ -1,4 +1,8 @@
 nix-shell-root
+result
 
 /.quarto/
 .DS_Store
+
+**/*.quarto_ipynb
+_targets/
