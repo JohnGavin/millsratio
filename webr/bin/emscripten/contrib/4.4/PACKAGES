@@ -4,4 +4,4 @@ Imports: dplyr, ggplot2, plotly, scales, shiny, stats, tidyr
 Suggests: bslib, covr, DT, gt, htmlwidgets, knitr, purrr, quarto,
         rmarkdown, shinylive, tarchetypes, targets, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: cd16c932b93133d90dce6cf130755ec8
+MD5sum: a054692d73a9e79a4816ea8684c4585f
